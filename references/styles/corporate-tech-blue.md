@@ -44,7 +44,7 @@ const theme = {
 | 正文 | Microsoft YaHei | 13–14 | Regular | `bodyText` |
 | 说明 / 描述 | Microsoft YaHei | 11–12 | Regular | `mutedText` |
 | KPI 大数字 | Arial Black | 48–64 | Bold | `secondary` 或 `accent` |
-| TOC 大数字 | Arial Black | 54 | Bold | `secondary` |
+| TOC 大数字 | Arial Black | 42 | Bold | `secondary` |
 | 章节分隔水印数字 | Arial Black | 200 | Bold | `watermark` |
 | 胶囊标签 | Microsoft YaHei | 22–24 | Bold | `FFFFFF` |
 | 总结要点 | Microsoft YaHei | 15–16 | Regular | `bodyText` |
@@ -84,13 +84,17 @@ const theme = {
 | 5行小内容 | 1.1 | 0.77 | ≤ 5.0 |
 | KPI 4卡片 | 1.25 | — | 卡片 h:3.2，底 4.45 |
 
-**内容密度上限（商业PPT黄金法则）：**
+**内容密度指引（客户汇报型，看完即懂）：**
 
-- 每张内容页：正文条目 ≤ 5 条，每条描述 ≤ 2 行
-- 每张对比页：列数 ≤ 4，行数 ≤ 6
-- 每张 KPI 页：指标数 ≤ 4（2×2 或 4×1）
-- 纯文字段落页：字数 ≤ 120 字，段落 ≤ 3 段
+> 本风格定位为**客户汇报型 PPT**，目标是让客户看完幻灯片就能理解内容，而非辅助演讲者讲话。优先信息传达密度，**不适用精简演讲风**。
+
+- 每张内容页：正文条目 4–7 条，每条描述 2–3 行（完整语义句，非关键词堆砌）
+- 每张对比页：列数 ≤ 4，行数 ≤ 8；单元格内容可写 1–2 句完整说明
+- 每张 KPI 页：指标数 ≤ 4（2×2 或 4×1），每卡片必须包含单位 + 标签 + 1 行说明
+- 纯文字段落页：字数 150–220 字，段落 3–4 段，每段 2–4 句完整表述
+- 特性/功能描述：标题 + 2–3 行说明（阐明原理或效果，避免只写功能名称）
 - 不允许在同一区域同时出现 4 种以上颜色
+- 避免内容过少：每张幻灯片信息量应足够客户无需听讲解也能自行阅读理解
 
 ## 标志性设计元素
 
@@ -179,41 +183,46 @@ function createSectionDividerSlide(pres, theme, num, title, subtitle, slideNum) 
 
 ```javascript
 function addTOCItem(slide, pres, theme, x, y, num, title, subtitle, maxW) {
-  // maxW: 条目总宽度（文字区 = maxW - 1.05）
-  const textX = x + 1.05;
+  // maxW: 条目总宽度（右边界 = x + maxW）
+  // 数字区宽度固定 1.1"，文字区从 x+1.22 开始
+  const numW  = 1.1;
+  const numH  = 0.72;
+  const divX  = x + numW + 0.05;          // 竖线紧贴数字区右侧
+  const textX = divX + 0.12;              // 文字区起点（竖线右侧留 0.12" 间距）
   const textW = (maxW !== undefined) ? (x + maxW - textX) : (9.55 - textX);
 
-  // 大数字
+  // 大数字（字号缩小至 42，确保在高度 0.72" 内完整显示，居中对齐防止截断）
   slide.addText(String(num).padStart(2, '0'), {
-    x: x, y: y, w: 0.85, h: 0.65,
-    fontSize: 54, fontFace: "Arial Black",
-    color: theme.secondary, bold: true, align: "right", valign: "middle", margin: 0
+    x: x, y: y, w: numW, h: numH,
+    fontSize: 42, fontFace: "Arial Black",
+    color: theme.secondary, bold: true, align: "center", valign: "middle", margin: 0
   });
-  // 竖分隔线
+  // 竖分隔线（与数字区垂直居中对齐）
   slide.addShape(pres.shapes.RECTANGLE, {
-    x: x + 0.9, y: y + 0.09, w: 0.04, h: 0.5,
+    x: divX, y: y + 0.11, w: 0.04, h: numH - 0.22,
     fill: { color: theme.secondary }
   });
   // 标题
   slide.addText(title, {
-    x: textX, y: y, w: textW, h: 0.36,
+    x: textX, y: y, w: textW, h: 0.40,
     fontSize: 17, fontFace: "Microsoft YaHei",
     color: theme.primary, bold: true, align: "left", valign: "bottom", margin: 0
   });
   // 副标题
   slide.addText(subtitle, {
-    x: textX, y: y + 0.35, w: textW, h: 0.28,
+    x: textX, y: y + 0.40, w: textW, h: 0.30,
     fontSize: 12, fontFace: "Microsoft YaHei",
     color: theme.mutedText, align: "left", valign: "top", margin: 0
   });
 }
 
-// 目录页用法示例（5个条目，x:4.8 开始，条目宽度 4.75"，行距 0.73"）：
-// addTOCItem(slide, pres, theme, 4.8, 0.62, 1, "产品背景", "现状威胁、标准规范", 4.75);
-// addTOCItem(slide, pres, theme, 4.8, 1.35, 2, "产品介绍", "产品概述、4大核心功能", 4.75);
-// addTOCItem(slide, pres, theme, 4.8, 2.08, 3, "部署成效", "产品选型、产品部署、产品成效", 4.75);
-// addTOCItem(slide, pres, theme, 4.8, 2.81, 4, "产品亮点", "核心技术、特色功能", 4.75);
-// addTOCItem(slide, pres, theme, 4.8, 3.54, 5, "案例资质", "实战案例、合作客户", 4.75);
+// 目录页用法示例（5个条目，x:4.6 开始，条目总宽 4.95"，行距 0.85"）：
+// 每行高度 = 0.72"，行距 0.85"，5 条总高 = 4*0.85+0.72 = 4.12"，起始 y:0.55，底部 4.67" ≤ 5.0" ✓
+// addTOCItem(slide, pres, theme, 4.6, 0.55, 1, "产品背景", "现状威胁、标准规范与行业挑战", 4.95);
+// addTOCItem(slide, pres, theme, 4.6, 1.40, 2, "产品介绍", "产品概述、4大核心功能模块", 4.95);
+// addTOCItem(slide, pres, theme, 4.6, 2.25, 3, "部署成效", "产品选型、部署方案与实测成效", 4.95);
+// addTOCItem(slide, pres, theme, 4.6, 3.10, 4, "产品亮点", "核心技术创新与特色功能详解", 4.95);
+// addTOCItem(slide, pres, theme, 4.6, 3.95, 5, "案例资质", "实战案例、合作客户与行业认证", 4.95);
 ```
 
 ### 5. 特性条目（Feature Item）
@@ -245,20 +254,28 @@ function addFeatureItem(slide, pres, theme, x, y, num, title, description, zoneW
     fontSize: 15, fontFace: "Microsoft YaHei",
     color: theme.primary, bold: true, align: "left", valign: "middle", margin: 0
   });
-  // 特性描述（限 2 行）
+  // 特性描述（支持 2–3 行完整说明，阐明原理或实际效果）
   slide.addText(description, {
-    x: textX, y: y + 0.34, w: textW, h: 0.54,
+    x: textX, y: y + 0.34, w: textW, h: 0.72,
     fontSize: 12, fontFace: "Microsoft YaHei",
     color: theme.bodyText, align: "left", valign: "top", margin: 0
   });
 }
 
-// 4个特性，右半区（x:5.1, zoneW:4.45），y 间距 0.97"：
-// addFeatureItem(slide, pres, theme, 5.1, 1.1,  1, "多维风险分析", "通过实时风险指标大盘...", 4.45);
-// addFeatureItem(slide, pres, theme, 5.1, 2.07, 2, "事件确认管理", "提供完整的事件处置流程...", 4.45);
-// addFeatureItem(slide, pres, theme, 5.1, 3.04, 3, "调用记录审计", "管理并提供所有调用记录...", 4.45);
-// addFeatureItem(slide, pres, theme, 5.1, 4.01, 4, "操作行为追溯", "完整记录平台管理员操作...", 4.45);
-// 注：第4条 y:4.01 + 0.34 + 0.54 = 4.89 ≤ 5.0，安全
+// 每条特性高度 = 标题 0.34 + 描述 0.72 = 1.06"；description 写 2–3 句完整说明
+//
+// ── 4条特性（行距 0.96"，紧凑但不溢出）──────────────────────────────────
+// 验算：y4=3.93, bottom=3.93+1.06=4.99 ≤ 5.0 ✓
+// addFeatureItem(slide, pres, theme, 5.1, 1.05, 1, "多维风险分析", "聚合多源数据计算综合风险评分，安全团队可直观掌握全局威胁态势，快速定位高危资产与薄弱环节。", 4.45);
+// addFeatureItem(slide, pres, theme, 5.1, 2.01, 2, "事件确认管理", "提供告警分级、责任人指派与处置记录全流程，确保每条告警有据可查，平均响应时间缩短 60%。", 4.45);
+// addFeatureItem(slide, pres, theme, 5.1, 2.97, 3, "调用记录审计", "全量采集所有 API 调用日志，支持多维度回溯审计，满足等保 2.0 审计要求，留存期可配置。", 4.45);
+// addFeatureItem(slide, pres, theme, 5.1, 3.93, 4, "操作行为追溯", "完整记录管理员操作轨迹，结合异常行为检测模型，自动识别越权操作与内部风险行为。", 4.45);
+//
+// ── 3条特性（行距 1.25"，描述可更丰富）──────────────────────────────────
+// 验算：y3=3.55, bottom=3.55+1.06=4.61 ≤ 5.0 ✓
+// addFeatureItem(slide, pres, theme, 5.1, 1.05, 1, "智能威胁感知", "...", 4.45);
+// addFeatureItem(slide, pres, theme, 5.1, 2.30, 2, "自动化响应", "...", 4.45);
+// addFeatureItem(slide, pres, theme, 5.1, 3.55, 3, "合规审计报告", "...", 4.45);
 ```
 
 ### 6. KPI 指标卡（4 宫格）
@@ -820,7 +837,8 @@ function createCoverSlideCentered(pres, theme, title, subtitle, dateOrEvent, com
 - 背景白色 `theme.bg`
 - 左侧 3D 图标图片：`x:0.3, y:0.8, w:4.0, h:4.0`；无图时用蓝色装饰块替代
 - 顶左："目录" 28pt bold `primary`；下方 "CONTENTS" 14pt `watermark` 色装饰字
-- 右侧 5 个条目用 `addTOCItem()`，`x:4.8, maxW:4.75`，起始 `y:0.62`，行距 `0.73"`
+- 右侧 5 个条目用 `addTOCItem()`，`x:4.6, maxW:4.95`，起始 `y:0.55`，行距 `0.85"`
+- **注意**：数字字号 42pt，条目行高 0.72"，行间距 0.85"；右边界 x+maxW = 9.55"，严格不超出
 - 页码徽章用 `addPageBadge()`
 
 ### 章节分隔页（Section Divider）
@@ -839,16 +857,32 @@ function createCoverSlideCentered(pres, theme, title, subtitle, dateOrEvent, com
 
 **子类型选择：**
 
-| 子类型 | 布局 | 典型用途 |
-|--------|------|----------|
-| 特性列表 | 左半 3D 图标 + 右半 `addFeatureItem()×4` | 功能模块详解 |
-| KPI 指标 | 2×2 `addKPICard()` | 成效数据、关键指标 |
-| 流程步骤 | 4×1 `addProcessStep()` | 实施路径、方法论 |
-| 痛点分析 | 3 列 `addInfoCard()` | 客户痛点、挑战场景 |
-| 对比矩阵 | `addColumnHeader()` + 行列数据 | 能力对比、方案选型 |
-| 架构示意 | 分层矩形 + 连接线 | 产品架构、系统集成 |
-| 文字分析 | 正文段落 + 底部双卡片 | 背景现状、政策解读 |
-| 数据大字 | 大字号数据 (56–72pt) + 说明 | 单指标突出展示 |
+| 子类型 | 函数/组件 | 典型用途 | 关系类型 |
+|--------|-----------|----------|----------|
+| 并列卡片 | `addParallelCards()` | 功能对比、特点列举、场景分类 | 并列（对等、无先后） |
+| 总分布局 | `addHierarchicalLayout()` | 总体概述+子项展开、一对多 | 总分（整体含子项） |
+| 带箭头流程 | `addFlowProcess()` | 实施步骤、操作流程 | 顺序（有先后依赖） |
+| 循环布局 | `addCycleLayout()` | PDCA、迭代周期、相互依存 | 循环（首尾相连） |
+| 金字塔布局 | `addPyramid()` | 层级结构、战略到执行 | 层级/优先级 |
+| 特性列表 | `addFeatureItem()×3-4` | 功能模块详解 | 并列 |
+| KPI 指标 | `addKPICard()` | 成效数据、关键指标 | 并列 |
+| 痛点分析 | `addInfoCard()×3` | 客户痛点、挑战场景 | 并列 |
+| 对比矩阵 | `addColumnHeader()` + 行列数据 | 能力对比、方案选型 | 对比 |
+| 数据大字 | 大字号数据 (56–72pt) + 说明 | 单指标突出展示 | — |
+
+**内容布局识别原则（根据内容关系自动选型）：**
+
+> 读完内容后先判断条目之间的关系，再选布局函数。禁止选"看起来好看"的布局而忽视内容逻辑。
+
+| 如果内容是… | 选哪种布局 |
+|-------------|------------|
+| 几个对等的功能/特点/场景，无先后顺序 | G1 并列卡片 |
+| 一个主概念下分 2-4 个子项 | G2 总分布局 |
+| 有明确先后顺序的步骤 | G3 带箭头流程 |
+| 相互促进/依赖、首尾相连 | G4 循环布局 |
+| 有高低层级、从战略到执行 | G5 金字塔布局 |
+
+**禁止留白过多**：所有图形布局必须填满内容区 `y:1.05–5.0`。每个方框内文字：标题 14–16pt bold + 正文 12–13pt，正文写 2–3 行完整语义句，不写单词/关键词。
 
 **痛点分析页（3列卡片）布局示例：**
 
@@ -858,6 +892,494 @@ function createCoverSlideCentered(pres, theme, title, subtitle, dateOrEvent, com
 // addInfoCard(slide, pres, theme, 3.52, 1.15, 2.87, 2.8, "痛点二：响应滞后", "告警处理依赖人工...");
 // addInfoCard(slide, pres, theme, 6.59, 1.15, 2.96, 2.8, "痛点三：合规压力", "等保 2.0 要求...");
 ```
+
+### 图形布局组件
+
+> **通用规则**：所有函数中 `startY` 默认 `1.05`，`endY` 默认 `5.0`。函数内部自动计算列宽、行高，填满内容区，无需手动调整坐标。
+
+#### G1. 并列卡片 addParallelCards
+
+**适用**：并列关系（对等的功能/特点/场景/优势），2–4 列。
+
+卡片结构：蓝色条头（标题）+ 浅蓝背景（正文），正文深色文字，确保可读性。
+
+```javascript
+/**
+ * @param {Array} items - [{ title, body }] 2-4条，body 写 2-3 行完整语义句
+ * @param {number} startY - 内容区起始 y，默认 1.05
+ */
+function addParallelCards(slide, pres, theme, items, startY) {
+  startY = startY || 1.05;
+  const n = items.length;
+  const totalW = 9.1;
+  const gap = 0.2;
+  const cardW = (totalW - gap * (n - 1)) / n;
+  const cardH = 5.0 - startY;
+
+  items.forEach((item, i) => {
+    const x = 0.45 + i * (cardW + gap);
+    // 卡片背景
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y: startY, w: cardW, h: cardH,
+      fill: { color: theme.light },
+      line: { color: theme.border, width: 1 }
+    });
+    // 蓝色条头
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y: startY, w: cardW, h: 0.46,
+      fill: { color: theme.secondary }
+    });
+    // 序号圆点（左侧）
+    slide.addShape(pres.shapes.OVAL, {
+      x: x + 0.12, y: startY + 0.08, w: 0.3, h: 0.3,
+      fill: { color: "FFFFFF", transparency: 30 }
+    });
+    slide.addText(String(i + 1), {
+      x: x + 0.12, y: startY + 0.08, w: 0.3, h: 0.3,
+      fontSize: 12, fontFace: "Arial Black",
+      color: theme.secondary, bold: true, align: "center", valign: "middle", margin: 0
+    });
+    // 条头标题（序号右侧）
+    slide.addText(item.title, {
+      x: x + 0.5, y: startY, w: cardW - 0.6, h: 0.46,
+      fontSize: 14, fontFace: "Microsoft YaHei",
+      color: "FFFFFF", bold: true, align: "left", valign: "middle", margin: 0
+    });
+    // 正文（条头下方，深色文字保证可读性）
+    slide.addText(item.body, {
+      x: x + 0.16, y: startY + 0.56, w: cardW - 0.32, h: cardH - 0.66,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: theme.bodyText, align: "left", valign: "top",
+      lineSpacingMultiple: 1.3, margin: 0
+    });
+  });
+}
+
+// 3列用法（startY 默认 1.05，卡片高 3.95"）：
+// addParallelCards(slide, pres, theme, [
+//   { title: "威胁感知", body: "实时采集终端、网络、云环境的安全事件，通过机器学习模型识别隐藏威胁，覆盖率达 98%。支持自定义规则库，适配各类业务场景。" },
+//   { title: "智能响应", body: "基于剧本化自动化处置引擎，在威胁确认后 30 秒内完成隔离、阻断等响应动作，显著缩短 MTTR。" },
+//   { title: "合规审计", body: "全量记录安全事件处置过程，自动生成等保 2.0、行业监管所需的审计报告，减少人工整理工作量 80%。" },
+// ]);
+```
+
+**坐标验算（3列，startY=1.05）**：
+- cardW = (9.1-0.4)/3 = 2.9，cardH = 3.95
+- col0 right = 0.45+2.9 = 3.35 | col1 right = 3.55+2.9 = 6.45 | col2 right = 6.65+2.9 = 9.55 ✓
+- 卡片底 = 1.05+3.95 = 5.0 ✓
+
+#### G2. 总分布局 addHierarchicalLayout
+
+**适用**：一个主概念+2–4 个子项展开，强调从整体到局部。
+
+结构：顶部全宽深蓝主框（总）→ 连接器 → 底部等宽子卡片（分）。
+
+```javascript
+/**
+ * @param {string} mainTitle - 顶部主框左侧标题（精简，12字以内）
+ * @param {string} mainBody  - 顶部主框右侧说明文字（1-2 句完整表述）
+ * @param {Array}  subs      - [{ title, body }] 2-4条子项
+ */
+function addHierarchicalLayout(slide, pres, theme, mainTitle, mainBody, subs) {
+  const n = subs.length;
+  const mainH = 1.1;
+  const connectorY = 1.05 + mainH;          // 2.15
+  const connH = 0.5;
+  const subY = connectorY + connH;           // 2.65
+  const subH = 5.0 - subY;                  // 2.35
+  const subW = (9.1 - 0.2 * (n - 1)) / n;
+  const centerX = 5.0;
+
+  // ── 主框（全宽，深蓝背景）────────────────────────────
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.45, y: 1.05, w: 9.1, h: mainH,
+    fill: { color: theme.primary }
+  });
+  // 左侧橙色竖条（标志性元素）
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.45, y: 1.05, w: 0.08, h: mainH,
+    fill: { color: theme.accent }
+  });
+  // 主标题
+  slide.addText(mainTitle, {
+    x: 0.65, y: 1.05, w: 2.8, h: mainH,
+    fontSize: 18, fontFace: "Microsoft YaHei",
+    color: "FFFFFF", bold: true, align: "left", valign: "middle", margin: 0
+  });
+  // 主说明文字
+  slide.addText(mainBody, {
+    x: 3.55, y: 1.05, w: 5.9, h: mainH,
+    fontSize: 13, fontFace: "Microsoft YaHei",
+    color: "E8F4FF", align: "left", valign: "middle",
+    lineSpacingMultiple: 1.3, margin: 0
+  });
+
+  // ── 连接器（主框 → 子框）───────────────────────────
+  // 主垂线（从主框底边中心向下）
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: centerX - 0.02, y: connectorY, w: 0.04, h: connH * 0.45,
+    fill: { color: theme.border }
+  });
+  // 水平线（连接各子框顶部中心）
+  const firstCx = 0.45 + subW / 2;
+  const lastCx  = 0.45 + (n - 1) * (subW + 0.2) + subW / 2;
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: firstCx, y: connectorY + connH * 0.45, w: lastCx - firstCx, h: 0.03,
+    fill: { color: theme.border }
+  });
+  // 各子框顶部垂线
+  subs.forEach((_, i) => {
+    const cx = 0.45 + i * (subW + 0.2) + subW / 2;
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: cx - 0.02, y: connectorY + connH * 0.45, w: 0.04, h: connH * 0.55,
+      fill: { color: theme.border }
+    });
+  });
+
+  // ── 子卡片（浅蓝背景，深色文字）───────────────────
+  subs.forEach((sub, i) => {
+    const x = 0.45 + i * (subW + 0.2);
+    // 卡片背景
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y: subY, w: subW, h: subH,
+      fill: { color: theme.light },
+      line: { color: theme.border, width: 1 }
+    });
+    // 蓝色条头
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y: subY, w: subW, h: 0.4,
+      fill: { color: theme.secondary }
+    });
+    slide.addText(sub.title, {
+      x: x + 0.1, y: subY, w: subW - 0.2, h: 0.4,
+      fontSize: 13, fontFace: "Microsoft YaHei",
+      color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0
+    });
+    // 子卡正文
+    slide.addText(sub.body, {
+      x: x + 0.14, y: subY + 0.50, w: subW - 0.28, h: subH - 0.60,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: theme.bodyText, align: "left", valign: "top",
+      lineSpacingMultiple: 1.3, margin: 0
+    });
+  });
+}
+
+// 3子项用法：
+// addHierarchicalLayout(slide, pres, theme,
+//   "AI 安全防护平台",
+//   "以人工智能为核心引擎，构建覆盖感知、研判、响应全链路的自动化安全防护体系，面向政企客户提供开箱即用的安全能力。",
+//   [
+//     { title: "威胁感知层", body: "通过多源日志融合与行为基线学习，实时识别异常流量和用户行为。内置 200+ 攻击指纹，0day 检出率提升 40%。" },
+//     { title: "智能研判层", body: "利用图神经网络关联事件上下文，将误报率降低至 5% 以内，每日自动处置告警 5000+，节省分析师 80% 精力。" },
+//     { title: "自动响应层", body: "剧本化编排 30 余种响应动作，支持与主流安全设备联动，平均响应时间由 4 小时压缩至 2 分钟。" },
+//   ]
+// );
+```
+
+**坐标验算（3子项）**：
+- mainBox: y=1.05, bottom=2.15 | subY=2.65, subH=2.35, bottom=5.0 ✓
+- subW = (9.1-0.4)/3 = 2.9；col2 right = 6.65+2.9 = 9.55 ✓
+
+#### G3. 带箭头流程 addFlowProcess
+
+**适用**：有先后顺序的步骤（实施路径、操作流程），3–4 步。
+
+全高方框（填满内容区），步骤间用橙色箭头衔接，正文描述详细操作内容。
+
+```javascript
+/**
+ * @param {Array} items - [{ title, body }] 3-4步，body 写具体操作内容/产出物
+ */
+function addFlowProcess(slide, pres, theme, items) {
+  const n = items.length;
+  const arrowSp = 0.2;                           // 箭头占 0.2" 间距
+  const stepW = (9.1 - arrowSp * (n - 1)) / n;  // 动态计算步骤宽度
+  const stepY = 1.1;
+  const stepH = 3.9;                             // 填满 y:1.1–5.0
+  const colors = [theme.primary, theme.secondary, theme.primary, theme.secondary];
+
+  items.forEach((item, i) => {
+    const x = 0.45 + i * (stepW + arrowSp);
+    const bg = colors[i % colors.length];
+
+    // 步骤方框（交替深蓝/亮蓝）
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y: stepY, w: stepW, h: stepH,
+      fill: { color: bg }
+    });
+
+    // 顶部步骤编号圆圈
+    const circleSize = 0.52;
+    const cx = x + stepW / 2 - circleSize / 2;
+    slide.addShape(pres.shapes.OVAL, {
+      x: cx, y: stepY + 0.22, w: circleSize, h: circleSize,
+      fill: { color: "FFFFFF", transparency: 20 }
+    });
+    slide.addText(String(i + 1), {
+      x: cx, y: stepY + 0.22, w: circleSize, h: circleSize,
+      fontSize: 18, fontFace: "Arial Black",
+      color: bg, bold: true, align: "center", valign: "middle", margin: 0
+    });
+
+    // 步骤标题
+    slide.addText(item.title, {
+      x: x + 0.1, y: stepY + 0.86, w: stepW - 0.2, h: 0.52,
+      fontSize: 15, fontFace: "Microsoft YaHei",
+      color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0
+    });
+
+    // 分隔线
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: x + 0.22, y: stepY + 1.44, w: stepW - 0.44, h: 0.02,
+      fill: { color: "FFFFFF", transparency: 55 }
+    });
+
+    // 步骤正文（填充剩余高度）
+    slide.addText(item.body, {
+      x: x + 0.16, y: stepY + 1.54, w: stepW - 0.32, h: stepH - 1.64,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: "E8F4FF", align: "left", valign: "top",
+      lineSpacingMultiple: 1.4, margin: 0
+    });
+
+    // 橙色箭头（连接到下一步，文字字符居中于间隔区）
+    if (i < n - 1) {
+      slide.addText("▶", {
+        x: x + stepW - 0.02, y: stepY + stepH / 2 - 0.2, w: arrowSp + 0.04, h: 0.4,
+        fontSize: 16, fontFace: "Arial",
+        color: theme.accent, bold: true, align: "center", valign: "middle", margin: 0
+      });
+    }
+  });
+}
+
+// 4步用法（stepW ≈ 2.11"，stepH=3.9"）：
+// addFlowProcess(slide, pres, theme, [
+//   { title: "需求调研", body: "与业务部门深度访谈，梳理现有安全架构痛点、合规差距与核心诉求。产出：需求确认书、差距分析报告。" },
+//   { title: "方案设计", body: "依据调研结论制定分层安全防护架构，规划感知、研判、响应三层模块边界与接口规范。产出：架构方案书。" },
+//   { title: "部署实施", body: "分阶段完成环境准备、系统安装、数据源接入与联调测试，全程提供专属实施顾问支持。产出：上线验收报告。" },
+//   { title: "运营交付", body: "提供 3 个月常驻运营支持，建立安全运营规程，完成核心人员培训，确保客户团队独立运营能力。" },
+// ]);
+//
+// 3步用法（stepW ≈ 2.9"，更宽，可写更多正文）：
+// addFlowProcess(slide, pres, theme, [
+//   { title: "现状评估", body: "..." },
+//   { title: "能力建设", body: "..." },
+//   { title: "持续优化", body: "..." },
+// ]);
+```
+
+**坐标验算（4步）**：stepW=(9.1-0.6)/4=2.125；last x=0.45+3*2.325=7.425，right=9.55 ✓；bottom=1.1+3.9=5.0 ✓
+
+#### G4. 循环布局 addCycleLayout
+
+**适用**：4 个环节首尾相连、相互依存（PDCA、监控→告警→响应→复盘 等循环模式）。
+
+2×2 方格，橙色方向箭头标示循环方向，中心椭圆放循环标签。
+
+```javascript
+/**
+ * @param {string} centerLabel - 中心标签文字（2-4字，如"持续循环"）
+ * @param {Array}  items       - [{ title, body }] 固定4条，顺时针：左上→右上→右下→左下
+ */
+function addCycleLayout(slide, pres, theme, centerLabel, items) {
+  const cardW = 4.0, cardH = 1.6;
+  const gapX = 1.1, gapY = 0.75;
+  const leftX = 0.45, rightX = leftX + cardW + gapX;  // 5.55
+  const topY  = 1.05, botY  = topY  + cardH + gapY;   // 3.40
+
+  // [右边界 9.55 ✓ 底边 5.0 ✓]
+  const positions = [
+    { x: leftX,  y: topY, color: theme.primary },    // 0: 左上
+    { x: rightX, y: topY, color: theme.secondary },  // 1: 右上
+    { x: rightX, y: botY, color: theme.primary },    // 2: 右下
+    { x: leftX,  y: botY, color: theme.secondary },  // 3: 左下
+  ];
+
+  // 中心椭圆标签
+  const elW = 0.9, elH = 0.65;
+  const elX = leftX + cardW + gapX / 2 - elW / 2;   // 4.6
+  const elY = topY  + cardH + gapY / 2 - elH / 2;   // 2.725
+  slide.addShape(pres.shapes.OVAL, {
+    x: elX, y: elY, w: elW, h: elH,
+    fill: { color: theme.accent }
+  });
+  slide.addText(centerLabel || "循环", {
+    x: elX, y: elY, w: elW, h: elH,
+    fontSize: 11, fontFace: "Microsoft YaHei",
+    color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0
+  });
+
+  // 4条方向箭头（顺时针）
+  const midTopY   = topY + cardH / 2;
+  const midBotY   = botY + cardH / 2;
+  const midLeftX  = leftX  + cardW / 2;
+  const midRightX = rightX + cardW / 2;
+
+  // → 左上到右上（水平顶部）
+  slide.addText("▶", {
+    x: leftX + cardW, y: midTopY - 0.18, w: gapX, h: 0.36,
+    fontSize: 18, fontFace: "Arial", color: theme.accent,
+    bold: true, align: "center", valign: "middle", margin: 0
+  });
+  // ↓ 右上到右下（垂直右侧）
+  slide.addText("▼", {
+    x: midRightX - 0.18, y: topY + cardH, w: 0.36, h: gapY,
+    fontSize: 18, fontFace: "Arial", color: theme.accent,
+    bold: true, align: "center", valign: "middle", margin: 0
+  });
+  // ← 右下到左下（水平底部）
+  slide.addText("◀", {
+    x: leftX + cardW, y: midBotY - 0.18, w: gapX, h: 0.36,
+    fontSize: 18, fontFace: "Arial", color: theme.accent,
+    bold: true, align: "center", valign: "middle", margin: 0
+  });
+  // ↑ 左下到左上（垂直左侧）
+  slide.addText("▲", {
+    x: midLeftX - 0.18, y: topY + cardH, w: 0.36, h: gapY,
+    fontSize: 18, fontFace: "Arial", color: theme.accent,
+    bold: true, align: "center", valign: "middle", margin: 0
+  });
+
+  // 4张卡片
+  items.forEach((item, i) => {
+    const { x, y, color } = positions[i];
+
+    // 卡片背景
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y, w: cardW, h: cardH,
+      fill: { color }
+    });
+    // 顶部装饰细条（橙色，增强辨识度）
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y, w: cardW, h: 0.05,
+      fill: { color: theme.accent }
+    });
+
+    // 序号
+    slide.addText(String(i + 1).padStart(2, '0'), {
+      x: x + 0.14, y: y + 0.1, w: 0.55, h: 0.42,
+      fontSize: 22, fontFace: "Arial Black",
+      color: "FFFFFF", bold: true,
+      align: "left", valign: "top", margin: 0
+    });
+    // 标题（序号右侧，右对齐）
+    slide.addText(item.title, {
+      x: x + 0.14, y: y + 0.1, w: cardW - 0.28, h: 0.42,
+      fontSize: 14, fontFace: "Microsoft YaHei",
+      color: "FFFFFF", bold: true, align: "right", valign: "top", margin: 0
+    });
+    // 正文
+    slide.addText(item.body, {
+      x: x + 0.18, y: y + 0.60, w: cardW - 0.36, h: cardH - 0.70,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: "E8F4FF", align: "left", valign: "top",
+      lineSpacingMultiple: 1.3, margin: 0
+    });
+  });
+}
+
+// 用法示例（PDCA 循环）：
+// addCycleLayout(slide, pres, theme, "持续改进", [
+//   { title: "Plan 规划", body: "识别安全风险，制定季度防护目标与资源计划，分解至各专项团队。" },
+//   { title: "Do 执行", body: "按计划开展渗透测试、配置加固、员工培训等安全建设工作，记录执行日志。" },
+//   { title: "Check 检查", body: "通过红蓝对抗与合规扫描验证防护效果，输出指标达成情况分析报告。" },
+//   { title: "Act 改进", body: "根据检查结论修订策略、补充规则库，将成功实践固化为标准操作流程。" },
+// ]);
+```
+
+**坐标验算**：rightX+cardW=9.55 ✓ | botY+cardH=5.0 ✓ | 箭头在 gapX/gapY 区域内，不与卡片重叠 ✓
+
+#### G5. 金字塔布局 addPyramid
+
+**适用**：层级结构、优先级高低、从战略（顶层窄）到基础（底层宽）。
+
+3–5 层矩形，宽度从上到下递增，居中对齐。每层左侧写标题、右侧写说明。
+
+```javascript
+/**
+ * @param {Array} items - [{ title, desc }]，index 0 = 顶层（最窄/最重要），最后一条 = 底层（最宽/基础）
+ *                        建议 3–5 条；顶层用 accent 色，往下渐变为 primary / secondary
+ */
+function addPyramid(slide, pres, theme, items) {
+  const n = items.length;
+  const minW = 2.2;                          // 顶层宽度
+  const maxW = 9.1;                          // 底层宽度（填满内容区）
+  const startY = 1.05, endY = 5.0;
+  const totalH = endY - startY;             // 3.95"
+  const rowH = totalH / n;                  // 每行占用高度（含间距）
+  const layerH = rowH - 0.04;              // 实际矩形高度（留 0.04" 间隙）
+
+  // 颜色：顶层 accent（橙，最显眼），往下变为深蓝/亮蓝
+  const layerColors = [
+    theme.accent,     // 顶层
+    theme.primary,
+    theme.secondary,
+    "#3D8FD8",
+    "#6AAEE6",
+  ];
+  const textColors  = ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"];
+
+  items.forEach((item, i) => {
+    // 宽度从顶到底线性增大
+    const fraction = n === 1 ? 1 : i / (n - 1);
+    const w = minW + (maxW - minW) * fraction;
+    const x = 0.45 + (maxW - w) / 2;        // 水平居中
+    const y = startY + i * rowH;
+    const color = layerColors[i % layerColors.length];
+    const textColor = textColors[i % textColors.length];
+
+    // 层背景
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x, y, w, h: layerH,
+      fill: { color }
+    });
+    // 左侧白色竖细条（增强分层感）
+    slide.addShape(pres.shapes.RECTANGLE, {
+      x: x + 0.14, y: y + 0.1, w: 0.04, h: layerH - 0.2,
+      fill: { color: "FFFFFF", transparency: 50 }
+    });
+
+    // 层标题（左区域）
+    const titleW = Math.min(w * 0.38, 3.2);
+    slide.addText(item.title, {
+      x: x + 0.26, y, w: titleW, h: layerH,
+      fontSize: 15, fontFace: "Microsoft YaHei",
+      color: textColor, bold: true, align: "left", valign: "middle", margin: 0
+    });
+
+    // 层描述（右区域，仅当层宽足够时显示）
+    if (item.desc && w > 3.5) {
+      slide.addText(item.desc, {
+        x: x + titleW + 0.36, y, w: w - titleW - 0.5, h: layerH,
+        fontSize: 12, fontFace: "Microsoft YaHei",
+        color: textColor, align: "left", valign: "middle",
+        lineSpacingMultiple: 1.3, margin: 0
+      });
+    }
+  });
+}
+
+// 4层用法（顶层=战略，底层=基础设施）：
+// addPyramid(slide, pres, theme, [
+//   { title: "战略目标",  desc: "构建行业领先的 AI 驱动安全运营体系，实现安全与业务深度融合。" },
+//   { title: "安全能力",  desc: "威胁感知、智能研判、自动响应、合规审计四大核心能力全面覆盖。" },
+//   { title: "平台支撑",  desc: "统一数据底座 + 开放 API 生态，无缝对接主流安全设备与 SIEM 平台。" },
+//   { title: "基础设施",  desc: "高可用集群部署，支持私有云、混合云、信创环境，99.95% SLA 保障。" },
+// ]);
+//
+// 3层用法（层更高，每层可写更多描述）：
+// addPyramid(slide, pres, theme, [
+//   { title: "决策层",   desc: "..." },
+//   { title: "管理层",   desc: "..." },
+//   { title: "执行层",   desc: "..." },
+// ]);
+```
+
+**坐标验算（4层，rowH=0.9875，layerH=0.9575）**：
+- layer0(顶): w=2.2, x=3.9, y=1.05, bottom=2.01 ✓
+- layer3(底): w=9.1, x=0.45, y=4.02, bottom=4.98 ✓，右边 9.55 ✓
 
 ### 案例页（Case Study）
 
