@@ -55,4 +55,4 @@ npm install -g pptxgenjs
 
 ---
 
-基于 [minimax/pptx-generator](https://github.com/minimax-labs/pptx-generator) 调整。
+基于 [MiniMax-AI/skills/pptx-generator](https://github.com/MiniMax-AI/skills/tree/main/skills/pptx-generator) 调整。
