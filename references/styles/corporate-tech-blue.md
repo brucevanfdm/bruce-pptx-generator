@@ -414,21 +414,233 @@ function addInfoCard(slide, pres, theme, x, y, w, h, headerText, bodyLines) {
 }
 ```
 
+## 装饰元素库
+
+两种使用模式：**背景纹理**（高透明度，`transparency ≥ 85`，不抢夺注意力）；**封面图形**（中透明度，`transparency 55–75`，作为构成元素）。
+
+所有装饰元素必须放在内容元素**之前**添加，确保内容层叠在装饰层上方。
+
+### D1. 点阵背景
+
+最克制的纹理。适合：内容页右上角、封面留白区、章节分隔页。
+
+```javascript
+/**
+ * @param {number} x/y/w/h - 点阵覆盖区域
+ * @param {object} opts
+ *   spacing     - 点间距，默认 0.38"
+ *   dotSize     - 点直径，默认 0.07"
+ *   color       - 颜色，默认 theme.secondary
+ *   transparency - 0-100，默认 88（背景模式）/ 65（封面模式）
+ */
+function addBgDotGrid(slide, pres, theme, x, y, w, h, opts = {}) {
+  const spacing     = opts.spacing      ?? 0.38;
+  const dotSize     = opts.dotSize      ?? 0.07;
+  const color       = opts.color        ?? theme.secondary;
+  const transp      = opts.transparency ?? 88;
+
+  const cols = Math.ceil(w / spacing);
+  const rows = Math.ceil(h / spacing);
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const dx = x + c * spacing;
+      const dy = y + r * spacing;
+      if (dx + dotSize > x + w || dy + dotSize > y + h) continue;
+      slide.addShape(pres.shapes.OVAL, {
+        x: dx, y: dy, w: dotSize, h: dotSize,
+        fill: { color: color, transparency: transp }
+      });
+    }
+  }
+}
+
+// 用法示例：
+// 内容页右上角点阵（背景模式）
+// addBgDotGrid(slide, pres, theme, 7.0, 0.9, 2.55, 1.8, { transparency: 88 });
+//
+// 封面右区点阵（封面模式，略深）
+// addBgDotGrid(slide, pres, theme, 6.1, 0.1, 3.9, 5.5, { spacing: 0.42, transparency: 78 });
+```
+
+### D2. 同心圆环
+
+有层次感的几何装饰。适合：封面右区、感谢页背景。仅使用描边（无填充），自然产生透视感。
+
+```javascript
+/**
+ * @param {number} cx/cy - 圆心坐标
+ * @param {object} opts
+ *   rings  - [{ r, transparency }] 半径和透明度数组
+ *   color  - 默认 theme.secondary
+ *   lineWidth - 描边宽度，默认 1.0pt
+ */
+function addCircleRings(slide, pres, theme, cx, cy, opts = {}) {
+  const color     = opts.color     ?? theme.secondary;
+  const lineWidth = opts.lineWidth ?? 1.0;
+  const rings     = opts.rings ?? [
+    { r: 0.9,  transparency: 60 },
+    { r: 1.5,  transparency: 70 },
+    { r: 2.1,  transparency: 78 },
+    { r: 2.7,  transparency: 85 },
+  ];
+
+  rings.forEach(({ r, transparency }) => {
+    slide.addShape(pres.shapes.OVAL, {
+      x: cx - r, y: cy - r, w: r * 2, h: r * 2,
+      fill: { type: "none" },
+      line: { color: color, width: lineWidth, transparency: transparency }
+    });
+  });
+}
+
+// 封面右区用法（圆心在右区中部）：
+// addCircleRings(slide, pres, theme, 8.05, 2.8, {
+//   rings: [
+//     { r: 0.8,  transparency: 55 },
+//     { r: 1.4,  transparency: 65 },
+//     { r: 2.0,  transparency: 75 },
+//     { r: 2.6,  transparency: 85 },
+//   ]
+// });
+//
+// 感谢页水印圆环（更大、更透明）：
+// addCircleRings(slide, pres, theme, 5.0, 2.8, {
+//   rings: [
+//     { r: 1.2, transparency: 75 },
+//     { r: 2.0, transparency: 82 },
+//     { r: 2.8, transparency: 88 },
+//   ],
+//   color: theme.primary
+// });
+```
+
+### D3. 几何角落装饰
+
+两个旋转矩形叠加，产生立体感角落。适合：封面、感谢页、章节分隔页。
+
+```javascript
+/**
+ * @param {"TR"|"BR"|"BL"|"TL"} corner - 目标角落
+ * @param {object} opts
+ *   size        - 基础尺寸，默认 1.4"
+ *   color1      - 大矩形颜色，默认 theme.primary
+ *   color2      - 小矩形颜色，默认 theme.secondary
+ *   transparency - 基础透明度，默认 80（背景模式 88）
+ */
+function addCornerGeometry(slide, pres, theme, corner, opts = {}) {
+  const size   = opts.size        ?? 1.4;
+  const c1     = opts.color1      ?? theme.primary;
+  const c2     = opts.color2      ?? theme.secondary;
+  const transp = opts.transparency ?? 80;
+
+  const positions = {
+    TR: { x: 10 - size * 1.1, y: -size * 0.2 },
+    BR: { x: 10 - size * 1.0, y: 5.625 - size * 0.9 },
+    BL: { x: -size * 0.2,     y: 5.625 - size * 1.0 },
+    TL: { x: -size * 0.2,     y: -size * 0.2 },
+  };
+  const { x, y } = positions[corner];
+  const rot = { TR: 20, BR: 65, BL: 20, TL: 65 };
+
+  // 大矩形
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    x: x, y: y, w: size, h: size,
+    rectRadius: 0.12,
+    fill: { color: c1, transparency: transp },
+    rotate: rot[corner]
+  });
+  // 错位小矩形
+  slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
+    x: x + size * 0.28, y: y + size * 0.28,
+    w: size * 0.72, h: size * 0.72,
+    rectRadius: 0.1,
+    fill: { color: c2, transparency: transp + 8 },
+    rotate: rot[corner] + 18
+  });
+}
+
+// 封面右上角 + 左下角组合：
+// addCornerGeometry(slide, pres, theme, "TR", { size: 1.6, transparency: 78 });
+// addCornerGeometry(slide, pres, theme, "BL", { size: 1.0, transparency: 85 });
+```
+
+### D4. 斜线条纹
+
+最轻盈的纹理，几乎不影响可读性。适合：内容页全版背景纹理、封面留白区。
+
+```javascript
+/**
+ * @param {number} x/y/w/h - 条纹覆盖区域
+ * @param {object} opts
+ *   spacing     - 条纹间距，默认 0.5"
+ *   color       - 默认 theme.secondary
+ *   transparency - 默认 92（极克制）
+ *   lineWidth   - 默认 0.5pt
+ */
+function addDiagonalStripes(slide, pres, theme, x, y, w, h, opts = {}) {
+  const spacing = opts.spacing      ?? 0.5;
+  const color   = opts.color        ?? theme.secondary;
+  const transp  = opts.transparency ?? 92;
+  const lw      = opts.lineWidth    ?? 0.5;
+
+  // LINE shape: (x,y) → (x+w, y+h)，利用 w/h 同值实现 45° 对角
+  const count = Math.ceil((w + h) / spacing) + 1;
+  for (let i = 0; i < count; i++) {
+    const offset = i * spacing - h;  // 让线条从区域左上扫到右下
+    // 计算裁剪后的线段起止点
+    let lx1 = x + offset;
+    let ly1 = y;
+    let lx2 = x + offset + h;
+    let ly2 = y + h;
+
+    // 裁剪到区域内
+    if (lx1 < x) { ly1 += (x - lx1); lx1 = x; }
+    if (lx2 > x + w) { ly2 -= (lx2 - (x + w)); lx2 = x + w; }
+    if (lx1 >= lx2 || ly1 >= ly2) continue;
+
+    slide.addShape(pres.shapes.LINE, {
+      x: lx1, y: ly1,
+      w: lx2 - lx1, h: ly2 - ly1,
+      line: { color: color, width: lw, transparency: transp }
+    });
+  }
+}
+
+// 内容页右半区轻纹理：
+// addDiagonalStripes(slide, pres, theme, 5.1, 1.0, 4.45, 4.0, { transparency: 93 });
+//
+// 封面右区轻纹理（叠在浅蓝背景上）：
+// addDiagonalStripes(slide, pres, theme, 6.1, 0.1, 3.9, 5.5, { spacing: 0.4, transparency: 90 });
+```
+
+### 装饰元素组合规则
+
+| 使用场景 | 推荐组合 | 透明度范围 |
+|----------|----------|------------|
+| 内容页背景（极克制） | 点阵 D1 放在一个角落 | 88–93 |
+| 章节分隔页 | 点阵 D1 + 圆环 D2（右侧） | 80–88 |
+| 封面右区 | 圆环 D2 + 角落几何 D3 + 斜线 D4 | 65–82 |
+| 感谢页 | 圆环 D2（全页，大半径） | 75–88 |
+| **禁止** | 同一页面超过 2 种装饰类型 | — |
+| **禁止** | 装饰元素叠加在正文文字区域 | — |
+
 ## 各页类型布局
 
 ### 封面页（Cover）
 
 **变体 A：左文右图（推荐，适合有产品视觉素材时）**
 
-设计原则：大区域保持浅色，深色仅用于细条和文字。
+设计原则：大区域保持浅色，深色仅用于细条和文字。右区用圆环 + 斜线纹理构建视觉层次（装饰层 → 结构层 → 内容层，顺序不可颠倒）。
 
 ```
-| [顶部深蓝细条]                                    |
-| 主标题（大，左对齐）        |  [浅蓝右区]         |
-| 橙色短横线                  |  [产品图/3D图标]    |
-| 副标题                      |                     |
-| 日期 / 场合                 |  公司名（深色文字） |
-| [底部细线]                                        |
+| [顶部深蓝细条]                                         |
+| 主标题（大，左对齐）   | [浅蓝右区]                    |
+| 橙色短横线             | [斜线纹理 D4，极克制]         |
+| 副标题                 | [同心圆环 D2，中透明度]       |
+| 日期 / 场合            | [角落几何 D3，右下]           |
+|                        | 公司名（深色文字，底部）      |
+| [底部亮蓝细条]                                         |
 ```
 
 ```javascript
@@ -436,12 +648,13 @@ function createCoverSlide(pres, theme, title, subtitle, dateOrEvent, company) {
   const slide = pres.addSlide();
   slide.background = { color: theme.bg };
 
-  // 顶部深蓝细条（品牌标识，替代大色块）
+  // ── 层 1：结构色块（最底层）──────────────────────────
+  // 顶部深蓝细条（品牌标识）
   slide.addShape(pres.shapes.RECTANGLE, {
     x: 0, y: 0, w: 10, h: 0.1,
     fill: { color: theme.primary }
   });
-  // 右区浅蓝背景（轻盈，非深色）
+  // 右区浅蓝背景
   slide.addShape(pres.shapes.RECTANGLE, {
     x: 6.05, y: 0.1, w: 3.95, h: 5.525,
     fill: { color: theme.light }
@@ -457,6 +670,27 @@ function createCoverSlide(pres, theme, title, subtitle, dateOrEvent, company) {
     fill: { color: theme.secondary }
   });
 
+  // ── 层 2：装饰纹理（叠在背景上，内容之下）──────────
+  // 右区斜线纹理（极克制）
+  addDiagonalStripes(slide, pres, theme, 6.1, 0.1, 3.9, 5.5, {
+    spacing: 0.42, transparency: 91
+  });
+  // 右区同心圆环（圆心在右区中偏上，作为视觉焦点）
+  addCircleRings(slide, pres, theme, 8.05, 2.5, {
+    rings: [
+      { r: 0.7,  transparency: 58 },
+      { r: 1.2,  transparency: 68 },
+      { r: 1.75, transparency: 76 },
+      { r: 2.3,  transparency: 84 },
+    ]
+  });
+  // 右下角几何装饰
+  addCornerGeometry(slide, pres, theme, "BR", {
+    size: 1.1, transparency: 80,
+    color1: theme.primary, color2: theme.secondary
+  });
+
+  // ── 层 3：内容文字（最顶层）────────────────────────
   // 主标题
   slide.addText(title, {
     x: 0.45, y: 1.2, w: 5.3, h: 1.8,
@@ -744,12 +978,18 @@ function createThankYouSlide(pres, theme, slideNum, contactInfo, subtitle) {
     fill: { color: theme.secondary }
   });
 
-  // 超大水印装饰字（背景层，极浅蓝，与章节分隔页同风格）
-  slide.addText("Q&A", {
-    x: 0, y: 0.5, w: 10, h: 4.5,
-    fontSize: 220, fontFace: "Arial Black",
-    color: theme.watermark, bold: true, align: "center", valign: "middle", margin: 0
+  // 装饰层：全页大圆环（背景层，与内容不重叠）
+  addCircleRings(slide, pres, theme, 5.0, 2.8, {
+    rings: [
+      { r: 1.0, transparency: 72 },
+      { r: 1.7, transparency: 80 },
+      { r: 2.4, transparency: 87 },
+    ],
+    color: theme.primary,
+    lineWidth: 1.5
   });
+  // 左侧点阵（只放左半区，不遮挡中部文字）
+  addBgDotGrid(slide, pres, theme, 0.3, 0.5, 2.5, 4.5, { transparency: 90 });
 
   // 感谢文字（居中）
   slide.addText("感谢聆听", {
