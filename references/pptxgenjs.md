@@ -384,48 +384,50 @@ titleSlide.addText("My Title", { placeholder: "title" });
 
 ## Common Pitfalls
 
-These issues cause file corruption, visual bugs, or broken output. Avoid them.
+These issues cause file corruption, visual bugs, or broken output. For layout and content mistakes see [qa.md](qa.md).
 
-1. **NEVER use "#" with hex colors** - causes file corruption
+1. **NEVER use "#" with hex colors** — causes file corruption
    ```javascript
    color: "FF0000"      // CORRECT
-   color: "#FF0000"     // WRONG
+   color: "#FF0000"     // WRONG — corrupts file
    ```
 
-2. **NEVER encode opacity in hex color strings** - 8-char colors (e.g., `"00000020"`) corrupt the file. Use the `opacity` property instead.
+2. **NEVER encode opacity in hex color strings** — 8-char hex (e.g. `"00000020"`) corrupts the file; use the `opacity` property instead
    ```javascript
-   shadow: { type: "outer", blur: 6, offset: 2, color: "00000020" }          // CORRUPTS FILE
-   shadow: { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.12 }  // CORRECT
+   shadow: { color: "00000020" }                          // CORRUPTS FILE
+   shadow: { color: "000000", opacity: 0.12 }             // CORRECT
    ```
 
-3. **Use `bullet: true`** - NEVER unicode symbols like "o" (creates double bullets)
+3. **Use `bullet: true`** — never Unicode bullet symbols like `"•"` (creates double bullets)
 
-4. **Use `breakLine: true`** between array items or text runs together
+4. **Use `breakLine: true`** between array items or text runs you want on separate lines
 
-5. **Avoid `lineSpacing` with bullets** - causes excessive gaps; use `paraSpaceAfter` instead
+5. **Avoid `lineSpacing` with bullets** — causes excessive gaps; use `paraSpaceAfter` instead
 
-6. **Each presentation needs fresh instance** - don't reuse `pptxgen()` objects
+6. **Each presentation needs a fresh instance** — don't reuse `pptxgen()` objects across calls
 
-7. **NEVER reuse option objects across calls** - PptxGenJS mutates objects in-place (e.g. converting shadow values to EMU). Sharing one object between multiple calls corrupts the second shape.
+7. **NEVER reuse option objects across calls** — PptxGenJS mutates objects in-place (converts shadow values to EMU). Sharing one object between multiple `addShape` calls corrupts the second shape.
    ```javascript
+   // WRONG — second call gets already-mutated values
    const shadow = { type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 };
-   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });  // second call gets already-converted values
-   slide.addShape(pres.shapes.RECTANGLE, { shadow, ... });
+   slide.addShape(pres.shapes.RECTANGLE, { shadow });
+   slide.addShape(pres.shapes.RECTANGLE, { shadow });
 
+   // CORRECT — factory function returns a fresh object each time
    const makeShadow = () => ({ type: "outer", blur: 6, offset: 2, color: "000000", opacity: 0.15 });
-   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });  // fresh object each time
-   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow(), ... });
+   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow() });
+   slide.addShape(pres.shapes.RECTANGLE, { shadow: makeShadow() });
    ```
 
-8. **Don't use `ROUNDED_RECTANGLE` with accent borders** - rectangular overlay bars won't cover rounded corners. Use `RECTANGLE` instead.
+8. **Don't use `ROUNDED_RECTANGLE` with accent border overlays** — rectangular bars won't cover rounded corners cleanly; use `RECTANGLE` instead
    ```javascript
-   // WRONG: Accent bar doesn't cover rounded corners
-   slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
+   // WRONG
+   slide.addShape(pres.shapes.ROUNDED_RECTANGLE, { x:1, y:1, w:3, h:1.5, fill:{ color:"FFFFFF" } });
+   slide.addShape(pres.shapes.RECTANGLE,         { x:1, y:1, w:0.08, h:1.5, fill:{ color:"0891B2" } });
 
-   // CORRECT: Use RECTANGLE for clean alignment
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 3, h: 1.5, fill: { color: "FFFFFF" } });
-   slide.addShape(pres.shapes.RECTANGLE, { x: 1, y: 1, w: 0.08, h: 1.5, fill: { color: "0891B2" } });
+   // CORRECT
+   slide.addShape(pres.shapes.RECTANGLE, { x:1, y:1, w:3, h:1.5, fill:{ color:"FFFFFF" } });
+   slide.addShape(pres.shapes.RECTANGLE, { x:1, y:1, w:0.08, h:1.5, fill:{ color:"0891B2" } });
    ```
 
 ---

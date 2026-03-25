@@ -1,311 +1,85 @@
 ---
-name: pptx-generator
+name: bruce-pptx-generator
 description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Handles three scenarios: (1) create a presentation from scratch with PptxGenJS using a complete design system (color palettes, style recipes, 5 slide types); (2) edit an existing PPTX file via XML manipulation; (3) read or analyze a presentation with markitdown. Always invoke this skill before generating any slide code or touching any .pptx file."
 license: MIT
 metadata:
-  version: "1.0"
+  version: "2.0"
   category: productivity
   sources:
     - https://gitbrent.github.io/PptxGenJS/
     - https://github.com/microsoft/markitdown
 ---
 
-# PPTX Generator & Editor
+# Bruce's PPTX Generator
 
-## Overview
+## Task Routing
 
-This skill handles all PowerPoint tasks: reading/analyzing existing presentations, editing template-based decks via XML manipulation, and creating presentations from scratch using PptxGenJS. It includes a complete design system (color palettes, fonts, style recipes) and detailed guidance for every slide type.
+Pick the right path based on the task, then load the listed files.
 
-## Quick Reference
+| Task | Load these files |
+|------|-----------------|
+| **Read / analyze** existing PPTX | *(no extra files needed — see command below)* |
+| **Edit** existing PPTX from template | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md) |
+| **Create from scratch** with style preset | [workflow.md](references/workflow.md) + preset file + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
+| **Create from scratch** without preset | [workflow.md](references/workflow.md) + [design-system.md](references/design-system.md) + [slide-types.md](references/slide-types.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
 
-| Task | Approach |
-|------|----------|
-| Read/analyze content | `python -m markitdown presentation.pptx` |
-| Edit or create from template | See [Editing Presentations](references/editing.md) |
-| Create from scratch | See [Creating from Scratch](#creating-from-scratch-workflow) below |
+## Style Presets
 
-| Item | Value |
-|------|-------|
-| **Dimensions** | 10" x 5.625" (LAYOUT_16x9) |
-| **Colors** | 6-char hex without # (e.g. `"FF0000"`) |
-| **English font** | Arial (default), or approved alternatives |
-| **Chinese font** | Microsoft YaHei |
-| **Page badge position** | x: 9.3", y: 5.1" |
-| **Theme keys** | `primary`, `secondary`, `accent`, `light`, `bg` |
-| **Shapes** | RECTANGLE, OVAL, LINE, ROUNDED_RECTANGLE |
-| **Charts** | BAR, LINE, PIE, DOUGHNUT, SCATTER, BUBBLE, RADAR |
+Using a preset? Load the preset file — it contains its own complete page layouts, component functions, color palette, and content density rules. The generic `design-system.md` and `slide-types.md` are **not needed** when a preset is active.
+
+| Preset | File | Best for |
+|--------|------|----------|
+| 企业科技蓝 | [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合，客户汇报型 |
 
 ## Reference Files
 
-| File | Contents |
-|------|----------|
-| [slide-types.md](references/slide-types.md) | 5 slide page types (Cover, TOC, Section Divider, Content, Summary) + additional layout patterns |
-| [design-system.md](references/design-system.md) | Color palettes, font reference, style recipes (Sharp/Soft/Rounded/Pill), typography & spacing |
-| [editing.md](references/editing.md) | Template-based editing workflow, XML manipulation, formatting rules, common pitfalls |
-| [pitfalls.md](references/pitfalls.md) | QA process, common mistakes, critical PptxGenJS pitfalls |
+| File | Purpose |
+|------|---------|
+| [workflow.md](references/workflow.md) | Steps 1–7 creation workflow, outline review, compile script |
 | [pptxgenjs.md](references/pptxgenjs.md) | Complete PptxGenJS API reference |
-| [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | **Style Preset: 企业科技蓝** — 深海军蓝+亮蓝+橙色下划线，适合AI/安全/产品汇报，含完整色板、6种可复用组件函数、各页布局说明 |
+| [qa.md](references/qa.md) | Pre-compile checklist, post-compile QA, common mistakes |
+| [design-system.md](references/design-system.md) | Generic color palettes, style recipes (no preset path only) |
+| [slide-types.md](references/slide-types.md) | Generic 5 page types (no preset path only) |
+| [editing.md](references/editing.md) | Template-based XML editing workflow |
 
 ## Reading Content
 
 ```shell
-# Text extraction
 python -m markitdown presentation.pptx
 ```
 
-## Creating from Scratch — Workflow
+## Mandatory Rules
 
-**Use when no template or reference presentation is available.**
+These apply to every slide in every presentation.
 
-### Step 1: Research & Requirements
+**Dimensions** — 10" × 5.625" (LAYOUT_16x9). Every element must satisfy `x + w ≤ 10` and `y + h ≤ 5.625`.
 
-Search to understand user requirements — topic, audience, purpose, tone, content depth.
+**Colors** — 6-char hex without `#` (e.g. `"FF0000"`). Never `"#FF0000"` — causes file corruption.
 
-### Step 2: Select Color Palette & Style
+**Fonts** — Chinese: `Microsoft YaHei` | English: `Arial` (or approved alternative)
 
-**If the user specifies a style preset**, load it directly and skip to Step 3:
+**Theme object** — exactly 5 keys, no others:
 
-| Preset | File | When to use |
-|--------|------|-------------|
-| 企业科技蓝 | [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | AI/安全/产品汇报，政企客户，正式场合 |
+| Key | Purpose |
+|-----|---------|
+| `theme.primary` | Darkest color — titles, primary text |
+| `theme.secondary` | Accent — interactive elements, highlights |
+| `theme.accent` | Signature accent color (e.g. orange line) |
+| `theme.light` | Light fill — card backgrounds, zebra rows |
+| `theme.bg` | Slide background |
 
-**Otherwise**, use the [Color Palette Reference](references/design-system.md) to select a palette and the [Font Reference](references/design-system.md) to choose a font pairing.
+Never use: `background`, `text`, `muted`, `darkest`, `lightest`, or any other key names.
 
-When using a style preset: load the preset file, use its `theme` object directly, and use the provided component functions (`addSlideTitleWithAccent`, `addTOCItem`, `addFeatureItem`, etc.) instead of writing from scratch.
+**Page badge** — required on every slide except the Cover:
+- Circle: `x: 9.3, y: 5.1, w: 0.4, h: 0.4`
+- Pill: `x: 9.1, y: 5.15, w: 0.6, h: 0.35`
+- Show page number only (e.g. `"3"`), never `"3/12"`
 
-### Step 3: Select Design Style
-
-Use the [Style Recipes](references/design-system.md) to choose a visual style (Sharp, Soft, Rounded, or Pill) matching the presentation tone.
-
-### Step 4: Plan Slide Outline
-
-Classify **every slide** as exactly one of the [5 page types](references/slide-types.md). Plan the content and layout for each slide. Ensure visual variety — do NOT repeat the same layout across slides.
-
-### Step 4.5: Outline Review (REQUIRED before writing any code)
-
-Review the planned outline before touching code. Fixing problems here is nearly free; fixing them after generation is expensive.
-
-**Narrative arc** — Does the deck tell a coherent story? Check that the sequence follows a logical flow, e.g.:
-- Product pitch: Problem → Solution → Proof → Action
-- Report: Context → Findings → Analysis → Recommendations
-- Training: Background → Concepts → Examples → Summary
-
-If the flow feels jumpy or sections are out of order, reorder now.
-
-**Visual variety map** — Write out the slide subtypes in sequence and look for runs:
-
-```
-Example (bad):  cover → TOC → text → text → text → text → summary
-Example (good): cover → TOC → divider → text → data → divider → comparison → text → summary
-```
-
-No more than 2 consecutive content slides with the same subtype. If you see a run of 3+ text slides, split them with a section divider or convert one to a data/comparison layout.
-
-**Content density balance** — Scan each slide's planned content. If any one slide has 3× more bullet points or items than adjacent slides, redistribute or cut. Dense slides will overflow; sparse slides waste space.
-
-**Required structure check**:
-- [ ] Deck has a Cover slide
-- [ ] If more than 5 slides: TOC is present
-- [ ] Each major section has a Section Divider
-- [ ] Deck ends with a Summary/Closing slide
-- [ ] Total slide count is appropriate for the context
-
-If any check fails, fix the outline before proceeding to Step 5.
-
-### Step 5: Generate Slide JS Files
-
-Create one JS file per slide in `slides/` directory. Each file must export a synchronous `createSlide(pres, theme)` function. Follow the [Slide Output Format](#slide-output-format) and the type-specific guidance in [slide-types.md](references/slide-types.md). Generate up to 5 slides concurrently using subagents if available.
-
-**Tell each subagent:**
-
-1. File naming: `slides/slide-01.js`, `slides/slide-02.js`, etc.
-2. Images go in: `slides/imgs/`
-3. Final PPTX goes in: `slides/output/`
-4. Dimensions: 10" x 5.625" (LAYOUT_16x9)
-5. Fonts: Chinese = Microsoft YaHei, English = Arial (or approved alternative)
-6. Colors: 6-char hex without # (e.g. `"FF0000"`)
-7. Must use the theme object contract (see [Theme Object Contract](#theme-object-contract))
-8. Must follow the [PptxGenJS API reference](references/pptxgenjs.md)
-
-### Step 5.5: Pre-Compile Code Review (REQUIRED)
-
-Before compiling, review every generated slide JS file against the checklist in [pitfalls.md](references/pitfalls.md). This is a code-level pass — you cannot see the rendered output, so catch problems now.
-
-**Check each slide for:**
-1. **Bounds** — `x + w ≤ 10` and `y + h ≤ 5.625` for every element
-2. **Overlaps** — no unintended element collisions
-3. **Background consistency** — all content pages use the exact same background value
-4. **Font/color compliance** — only theme fonts and palette colors
-5. **Title structure** — consistent y-position and accent bar across all content slides
-6. **Page badge** — present on every non-cover slide
-
-Write out findings explicitly. Fix all issues before moving to Step 6.
-
-### Step 6: Compile into Final PPTX
-
-Create `slides/compile.js` to combine all slide modules:
-
-```javascript
-// slides/compile.js
-const pptxgen = require('pptxgenjs');
-const fs = require('fs');
-const path = require('path');
-
-const pres = new pptxgen();
-pres.layout = 'LAYOUT_16x9';
-
-// Replace with the palette chosen in Step 2
-const theme = {
-  primary: "22223b",
-  secondary: "4a4e69",
-  accent: "9a8c98",
-  light: "c9ada7",
-  bg: "f2e9e4"
-};
-
-// Auto-discover slide files in order
-const slideFiles = fs.readdirSync(__dirname)
-  .filter(f => /^slide-\d+\.js$/.test(f))
-  .sort();
-
-for (const file of slideFiles) {
-  const slideModule = require(path.join(__dirname, file));
-  slideModule.createSlide(pres, theme);
-}
-
-fs.mkdirSync(path.join(__dirname, 'output'), { recursive: true });
-pres.writeFile({ fileName: path.join(__dirname, 'output', 'presentation.pptx') });
-```
-
-Run with: `cd slides && node compile.js`
-
-### Step 7: QA (Required)
-
-See [QA Process](references/pitfalls.md).
-
-### Output Structure
-
-```
-slides/
-├── slide-01.js # Slide modules
-├── slide-02.js
-├── ...
-├── imgs/ # Images used in slides
-└── output/ # Final artifacts
-    └── presentation.pptx
-```
-
-## Slide Output Format
-
-Each slide is a **complete, runnable JS file**.
-
-Before writing any code, fill in the DESIGN INTENT block at the top. This forces a layout decision before implementation and makes the Step 5.5 review much faster.
-
-```javascript
-// slide-01.js
-const pptxgen = require("pptxgenjs");
-
-// DESIGN INTENT:
-//   Type    : cover
-//   Layout  : Asymmetric — left: title + subtitle + date, right: decorative shape block
-//   Focal   : Main title at y:1.8, fontSize:56, bold
-//   Zones   : Left text zone x:0.5–5.5 | Right visual zone x:5.8–9.8
-//   BG      : theme.bg (same as all content slides)
-//   Badge   : none (cover page)
-
-const slideConfig = {
-  type: 'cover',
-  index: 1,
-  title: 'Presentation Title'
-};
-
-// MUST be synchronous (not async)
-function createSlide(pres, theme) {
-  const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
-
-  slide.addText(slideConfig.title, {
-    x: 0.5, y: 2, w: 9, h: 1.2,
-    fontSize: 48, fontFace: "Arial",
-    color: theme.primary, bold: true, align: "center"
-  });
-
-  return slide;
-}
-
-// Standalone preview - use slide-specific filename
-if (require.main === module) {
-  const pres = new pptxgen();
-  pres.layout = 'LAYOUT_16x9';
-  const theme = {
-    primary: "22223b",
-    secondary: "4a4e69",
-    accent: "9a8c98",
-    light: "c9ada7",
-    bg: "f2e9e4"
-  };
-  createSlide(pres, theme);
-  pres.writeFile({ fileName: "slide-01-preview.pptx" });
-}
-
-module.exports = { createSlide, slideConfig };
-```
-
-## Theme Object Contract (MANDATORY)
-
-The compile script passes a theme object with these **exact keys**:
-
-| Key | Purpose | Example |
-|-----|---------|---------|
-| `theme.primary` | Darkest color, titles | `"22223b"` |
-| `theme.secondary` | Dark accent, body text | `"4a4e69"` |
-| `theme.accent` | Mid-tone accent | `"9a8c98"` |
-| `theme.light` | Light accent | `"c9ada7"` |
-| `theme.bg` | Background color | `"f2e9e4"` |
-
-**NEVER use other key names** like `background`, `text`, `muted`, `darkest`, `lightest`.
-
-## Page Number Badge (REQUIRED)
-
-All slides **except Cover Page** MUST include a page number badge in the bottom-right corner.
-
-- **Position**: x: 9.3", y: 5.1"
-- Show current number only (e.g. `3` or `03`), NOT "3/12"
-- Use palette colors, keep subtle
-
-### Circle Badge (Default)
-
-```javascript
-slide.addShape(pres.shapes.OVAL, {
-  x: 9.3, y: 5.1, w: 0.4, h: 0.4,
-  fill: { color: theme.accent }
-});
-slide.addText("3", {
-  x: 9.3, y: 5.1, w: 0.4, h: 0.4,
-  fontSize: 12, fontFace: "Arial",
-  color: "FFFFFF", bold: true,
-  align: "center", valign: "middle"
-});
-```
-
-### Pill Badge
-
-```javascript
-slide.addShape(pres.shapes.ROUNDED_RECTANGLE, {
-  x: 9.1, y: 5.15, w: 0.6, h: 0.35,
-  fill: { color: theme.accent },
-  rectRadius: 0.15
-});
-slide.addText("03", {
-  x: 9.1, y: 5.15, w: 0.6, h: 0.35,
-  fontSize: 11, fontFace: "Arial",
-  color: "FFFFFF", bold: true,
-  align: "center", valign: "middle"
-});
-```
+**`createSlide()` must be synchronous** — never `async`. compile.js won't await it.
 
 ## Dependencies
 
-- `pip install "markitdown[pptx]"` — text extraction
-- `npm install -g pptxgenjs` — creating from scratch
-- `npm install -g react-icons react react-dom sharp` — icons (optional)
+```shell
+pip install "markitdown[pptx]"   # text extraction
+npm install -g pptxgenjs          # create from scratch
+```

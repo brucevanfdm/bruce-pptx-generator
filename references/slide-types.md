@@ -1,5 +1,7 @@
 # Slide Page Types
 
+> **When using a style preset** (e.g. 企业科技蓝), the preset's own page-type layouts, component functions, and content density rules take precedence over this document. Use this document only when designing from scratch **without** a preset, or as a reference for layout patterns not covered by the preset.
+
 Classify **every slide** as **exactly one** of these 5 types:
 
 ## 1. Cover Page
