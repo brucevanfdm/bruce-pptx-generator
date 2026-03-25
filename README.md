@@ -52,3 +52,7 @@
 ```shell
 npm install -g pptxgenjs
 ```
+
+---
+
+基于 [minimax/pptx-generator](https://github.com/minimax-labs/pptx-generator) 调整。
