@@ -199,13 +199,41 @@ slide.addImage({ path: "image.png", x: centerX, y: 1.2, w: calcWidth, h: maxHeig
 
 Use react-icons to generate SVG icons, then rasterize to PNG for universal compatibility.
 
-### Setup
+**Important**: Icon generation is async, but `createSlide()` must be synchronous. Pre-generate all icon data before calling `createSlide()`, then pass it in as a parameter or store it in a variable accessible from the outer scope.
+
+### Pattern: Pre-generate icons in compile.js, pass to createSlide
 
 ```javascript
+// In compile.js (async context is fine here)
+const { iconToBase64Png } = require("./icon-utils");
+const { FaCheckCircle } = require("react-icons/fa");
+
+// Pre-generate before creating slides
+const checkIcon = await iconToBase64Png(FaCheckCircle, "#4472C4", 256);
+
+// Pass as extra argument
+const slideModule = require("./slide-03.js");
+slideModule.createSlide(pres, theme, { checkIcon });
+```
+
+```javascript
+// In slide-03.js
+function createSlide(pres, theme, icons = {}) {
+  const slide = pres.addSlide();
+  if (icons.checkIcon) {
+    slide.addImage({ data: icons.checkIcon, x: 1, y: 1, w: 0.5, h: 0.5 });
+  }
+  return slide;
+}
+```
+
+### Icon Utility Setup
+
+```javascript
+// icon-utils.js
 const React = require("react");
 const ReactDOMServer = require("react-dom/server");
 const sharp = require("sharp");
-const { FaCheckCircle, FaChartLine } = require("react-icons/fa");
 
 function renderIconSvg(IconComponent, color = "#000000", size = 256) {
   return ReactDOMServer.renderToStaticMarkup(
@@ -218,20 +246,11 @@ async function iconToBase64Png(IconComponent, color, size = 256) {
   const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
   return "image/png;base64," + pngBuffer.toString("base64");
 }
+
+module.exports = { iconToBase64Png };
 ```
 
-### Add Icon to Slide
-
-```javascript
-const iconData = await iconToBase64Png(FaCheckCircle, "#4472C4", 256);
-
-slide.addImage({
-  data: iconData,
-  x: 1, y: 1, w: 0.5, h: 0.5  // Size in inches
-});
-```
-
-**Note**: "Use size 256 or higher for crisp icons. The size parameter controls the rasterization resolution, not the display size on the slide (which is set by `w` and `h` in inches)."
+**Note**: Use size 256 or higher for crisp icons. The size parameter controls rasterization resolution, not the display size on the slide (which is set by `w` and `h` in inches).
 
 ### Icon Libraries
 

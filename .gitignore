@@ -1,0 +1,13 @@
+# Temp / work-in-progress assets
+references/temp/
+
+# Node
+node_modules/
+
+# Output files
+slides/output/
+*.pptx
+
+# OS
+.DS_Store
+Thumbs.db

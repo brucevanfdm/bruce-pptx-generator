@@ -412,12 +412,3 @@ Use these across content slides for visual variety:
 - **Icons in small colored circles** next to section headers
 - **Italic accent text** for key stats or taglines
 
----
-
-All 5 files have been fetched and returned in full. Here is a summary of what each file contains:
-
-- **design-system.md**: 18 color palettes, full Agent Design System color scales (White/Gold/Blue/Gray/Opacity), mandatory color rules, font reference and pairings, and 4 style recipes (Sharp/Soft/Rounded/Pill) with component mapping, typography scale, and spacing scale.
-- **editing.md**: Step-by-step workflow for editing existing PPTX files via XML manipulation, output structure, slide operations (reorder/delete/add), formatting rules, and common pitfalls for template editing including multi-item content and smart quotes.
-- **pitfalls.md**: QA process with verification loop, content QA commands, and a comprehensive list of common mistakes and critical PptxGenJS-specific pitfalls (hex colors, opacity encoding, async/await, object reuse).
-- **pptxgenjs.md**: Full PptxGenJS API tutorial covering setup, layout dimensions, text/formatting, lists/bullets, shapes (with shadow options table), images, icons (react-icons + sharp), slide backgrounds, tables, charts (including styling tips), slide masters, common pitfalls, and a quick reference.
-- **slide-types.md**: Classification of all 5 slide types (Cover, Table of Contents, Section Divider, Content Page, Summary/Closing), each with layout options (ASCII diagrams), font size hierarchies, content elements, design decisions, and workflows. Also includes additional layout patterns.

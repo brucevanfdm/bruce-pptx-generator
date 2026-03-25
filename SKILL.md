@@ -1,6 +1,6 @@
 ---
 name: pptx-generator
-description: "Generate, edit, and read PowerPoint presentations. Create from scratch with PptxGenJS (cover, TOC, content, section divider, summary slides), edit existing PPTX via XML workflows, or extract text with markitdown. Triggers: PPT, PPTX, PowerPoint, presentation, slide, deck, slides."
+description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Handles three scenarios: (1) create a presentation from scratch with PptxGenJS using a complete design system (color palettes, style recipes, 5 slide types); (2) edit an existing PPTX file via XML manipulation; (3) read or analyze a presentation with markitdown. Always invoke this skill before generating any slide code or touching any .pptx file."
 license: MIT
 metadata:
   version: "1.0"
@@ -44,6 +44,7 @@ This skill handles all PowerPoint tasks: reading/analyzing existing presentation
 | [editing.md](references/editing.md) | Template-based editing workflow, XML manipulation, formatting rules, common pitfalls |
 | [pitfalls.md](references/pitfalls.md) | QA process, common mistakes, critical PptxGenJS pitfalls |
 | [pptxgenjs.md](references/pptxgenjs.md) | Complete PptxGenJS API reference |
+| [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | **Style Preset: 企业科技蓝** — 深海军蓝+亮蓝+橙色下划线，适合AI/安全/产品汇报，含完整色板、6种可复用组件函数、各页布局说明 |
 
 ## Reading Content
 
@@ -60,13 +61,21 @@ python -m markitdown presentation.pptx
 
 Search to understand user requirements — topic, audience, purpose, tone, content depth.
 
-### Step 2: Select Color Palette & Fonts
+### Step 2: Select Color Palette & Style
 
-Use the [Color Palette Reference](references/design-system.md#color-palette-reference) to select a palette matching the topic and audience. Use the [Font Reference](references/design-system.md#font-reference) to choose a font pairing.
+**If the user specifies a style preset**, load it directly and skip to Step 3:
+
+| Preset | File | When to use |
+|--------|------|-------------|
+| 企业科技蓝 | [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | AI/安全/产品汇报，政企客户，正式场合 |
+
+**Otherwise**, use the [Color Palette Reference](references/design-system.md) to select a palette and the [Font Reference](references/design-system.md) to choose a font pairing.
+
+When using a style preset: load the preset file, use its `theme` object directly, and use the provided component functions (`addSlideTitleWithAccent`, `addTOCItem`, `addFeatureItem`, etc.) instead of writing from scratch.
 
 ### Step 3: Select Design Style
 
-Use the [Style Recipes](references/design-system.md#style-recipes) to choose a visual style (Sharp, Soft, Rounded, or Pill) matching the presentation tone.
+Use the [Style Recipes](references/design-system.md) to choose a visual style (Sharp, Soft, Rounded, or Pill) matching the presentation tone.
 
 ### Step 4: Plan Slide Outline
 
@@ -94,31 +103,40 @@ Create `slides/compile.js` to combine all slide modules:
 ```javascript
 // slides/compile.js
 const pptxgen = require('pptxgenjs');
+const fs = require('fs');
+const path = require('path');
+
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_16x9';
 
+// Replace with the palette chosen in Step 2
 const theme = {
-  primary: "22223b", // dark color for backgrounds/text
-  secondary: "4a4e69", // secondary accent
-  accent: "9a8c98", // highlight color
-  light: "c9ada7", // light accent
-  bg: "f2e9e4" // background color
+  primary: "22223b",
+  secondary: "4a4e69",
+  accent: "9a8c98",
+  light: "c9ada7",
+  bg: "f2e9e4"
 };
 
-for (let i = 1; i <= 12; i++) { // adjust count as needed
-  const num = String(i).padStart(2, '0');
-  const slideModule = require(`./slide-${num}.js`);
+// Auto-discover slide files in order
+const slideFiles = fs.readdirSync(__dirname)
+  .filter(f => /^slide-\d+\.js$/.test(f))
+  .sort();
+
+for (const file of slideFiles) {
+  const slideModule = require(path.join(__dirname, file));
   slideModule.createSlide(pres, theme);
 }
 
-pres.writeFile({ fileName: './output/presentation.pptx' });
+fs.mkdirSync(path.join(__dirname, 'output'), { recursive: true });
+pres.writeFile({ fileName: path.join(__dirname, 'output', 'presentation.pptx') });
 ```
 
 Run with: `cd slides && node compile.js`
 
 ### Step 7: QA (Required)
 
-See [QA Process](references/pitfalls.md#qa-process).
+See [QA Process](references/pitfalls.md).
 
 ### Output Structure
 
