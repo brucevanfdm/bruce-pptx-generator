@@ -21,15 +21,15 @@ Pick the right path based on the task, then load the listed files.
 | **Read / analyze** existing PPTX | *(no extra files needed — see command below)* |
 | **Edit** existing PPTX from template | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md) |
 | **Create from scratch** with style preset | [workflow.md](references/workflow.md) + preset file + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
-| **Create from scratch** without preset | [workflow.md](references/workflow.md) + [design-system.md](references/design-system.md) + [slide-types.md](references/slide-types.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
+| **Create from scratch** without preset | [workflow.md](references/workflow.md) + [custom-style-guide.md](references/custom-style-guide.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
 
 ## Style Presets
 
-Using a preset? Load the preset file — it contains its own complete page layouts, component functions, color palette, and content density rules. The generic `design-system.md` and `slide-types.md` are **not needed** when a preset is active.
+Using a preset? Load the preset file — it contains its own complete page layouts, component functions, color palette, and content density rules. The generic `custom-style-guide.md` is **not needed** when a preset is active.
 
 | Preset | File | Best for |
 |--------|------|----------|
-| 企业科技蓝（默认） | [corporate-tech-blue.md](references/corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合，客户汇报型 |
+| 企业科技蓝（默认） | [default-style.md](references/default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合，客户汇报型 |
 
 ## Reference Files
 
@@ -38,8 +38,7 @@ Using a preset? Load the preset file — it contains its own complete page layou
 | [workflow.md](references/workflow.md) | Steps 1–7 creation workflow, outline review, compile script |
 | [pptxgenjs.md](references/pptxgenjs.md) | Complete PptxGenJS API reference |
 | [qa.md](references/qa.md) | Pre-compile checklist, post-compile QA, common mistakes |
-| [design-system.md](references/design-system.md) | Generic color palettes, style recipes (no preset path only) |
-| [slide-types.md](references/slide-types.md) | Generic 5 page types (no preset path only) |
+| [custom-style-guide.md](references/custom-style-guide.md) | Color palettes, style recipes, 5 page types (no preset path only) |
 | [editing.md](references/editing.md) | Template-based XML editing workflow |
 
 ## Reading Content

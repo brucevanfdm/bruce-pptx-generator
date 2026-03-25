@@ -22,21 +22,21 @@ Understand the user's needs before touching any code:
 
 | Preset | File | When to use |
 |--------|------|-------------|
-| 企业科技蓝 | [corporate-tech-blue.md](corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
+| 企业科技蓝（默认） | [default-style.md](default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
 
 When a preset is active:
 - Use its `theme` object directly
 - Use its provided component functions (`addSlideTitleWithAccent`, `addTOCItem`, `addFeatureItem`, etc.)
 - Follow its content density rules (for 企业科技蓝: client briefing style, complete sentences, 4–7 items per slide)
-- Its page-type guidance supersedes [slide-types.md](slide-types.md)
+- Its page-type guidance supersedes [custom-style-guide.md](custom-style-guide.md)
 
-**If no preset is specified** → use [design-system.md](design-system.md) to select a color palette.
+**If no preset is specified** → use [custom-style-guide.md](custom-style-guide.md) to select a color palette.
 
 ---
 
 ## Step 3: Select Design Style (skip if using a preset)
 
-Use [design-system.md](design-system.md) Style Recipes to choose one of:
+Use [custom-style-guide.md](custom-style-guide.md) Style Recipes to choose one of:
 
 | Recipe | Feel | Best for |
 |--------|------|---------|
@@ -59,7 +59,7 @@ Classify **every slide** as exactly one of the 5 page types:
 | Content | Main information slides — all variants |
 | Summary | Closing — key takeaways, CTA, thank-you |
 
-Ensure visual variety — do NOT use the same content layout on consecutive slides. See [slide-types.md](slide-types.md) for detailed layout options per type (when not using a preset).
+Ensure visual variety — do NOT use the same content layout on consecutive slides. See [custom-style-guide.md](custom-style-guide.md) for detailed layout options per type (when not using a preset).
 
 ---
 
