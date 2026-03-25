@@ -96,6 +96,20 @@ Create one JS file per slide in `slides/` directory. Each file must export a syn
 7. Must use the theme object contract (see [Theme Object Contract](#theme-object-contract))
 8. Must follow the [PptxGenJS API reference](references/pptxgenjs.md)
 
+### Step 5.5: Pre-Compile Code Review (REQUIRED)
+
+Before compiling, review every generated slide JS file against the checklist in [pitfalls.md](references/pitfalls.md). This is a code-level pass — you cannot see the rendered output, so catch problems now.
+
+**Check each slide for:**
+1. **Bounds** — `x + w ≤ 10` and `y + h ≤ 5.625` for every element
+2. **Overlaps** — no unintended element collisions
+3. **Background consistency** — all content pages use the exact same background value
+4. **Font/color compliance** — only theme fonts and palette colors
+5. **Title structure** — consistent y-position and accent bar across all content slides
+6. **Page badge** — present on every non-cover slide
+
+Write out findings explicitly. Fix all issues before moving to Step 6.
+
 ### Step 6: Compile into Final PPTX
 
 Create `slides/compile.js` to combine all slide modules:
