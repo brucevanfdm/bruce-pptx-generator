@@ -26,6 +26,15 @@ When using an existing presentation as a template:
 
    Match content type to layout style (e.g., key points -> bullet slide, team info -> multi-column, testimonials -> quote slide).
 
+2.5. **Mapping review** — Before touching any files, verify the mapping is sound:
+
+- **Slot count match**: For every multi-item template (team grid, feature list, timeline), count the template slots vs. the source items. If they differ, decide now: delete excess slots or split content into multiple slides. Never discover this mid-edit.
+- **Content length fit**: For each planned text replacement, estimate length. A 3-line template body won't fit an 8-bullet source list — decide to trim, split, or choose a different template slide before you start.
+- **Coverage**: Every piece of source content maps to exactly one slide. No orphaned content, no slide with two sections crammed in.
+- **Required slides present**: Cover, at least one content slide, and closing/summary exist in the mapping.
+
+Write out any mismatches found. Resolve them (choose a different template slide, trim content, add a slide) before proceeding to step 3.
+
 3. **Unpack**: Extract the PPTX into an editable XML tree using Python's `zipfile` module. Pretty-print the XML for readability.
 
 4. **Build presentation** (do this yourself, not with subagents):

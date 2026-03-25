@@ -93,6 +93,25 @@ Every slide except the Cover must have a page number badge. Check:
 - Badge shows correct sequential number
 - Badge position: `x: 9.3, y: 5.1, w: 0.4, h: 0.4` (or equivalent pill variant)
 
+### 8. Cross-Slide Consistency Matrix
+
+After checking all slides individually, do one cross-slide pass. Build a quick table in your head (or write it out):
+
+| Slide | Type | Title y | Title fontSize | Content start y | Background |
+|-------|------|---------|---------------|-----------------|------------|
+| 01 | cover | — | — | — | `theme.bg` |
+| 02 | toc | 0.22 | 30 | 0.9 | `theme.bg` |
+| 03 | divider | — | — | — | `EEF6FF` |
+| 04 | content | 0.22 | 30 | 1.0 | `FFFFFF` |
+| 05 | content | 0.22 | 30 | 1.0 | `FFFFFF` |
+| 06 | content | **0.3** | **28** | 1.0 | `FFFFFF` ← **flag: title y and fontSize differ** |
+
+Flag any same-type slides where these values differ. Common inconsistencies:
+- Title `y` drifts by 0.1–0.2" between slides (looks misaligned when flipping)
+- Title `fontSize` varies (28 vs 30 vs 32 — pick one and use it everywhere)
+- Content area start `y` inconsistent (body text starts at different heights)
+- One content slide has a slightly different background hex
+
 ### How to report issues
 
 After reviewing all slides, list findings like:

@@ -81,6 +81,37 @@ Use the [Style Recipes](references/design-system.md) to choose a visual style (S
 
 Classify **every slide** as exactly one of the [5 page types](references/slide-types.md). Plan the content and layout for each slide. Ensure visual variety — do NOT repeat the same layout across slides.
 
+### Step 4.5: Outline Review (REQUIRED before writing any code)
+
+Review the planned outline before touching code. Fixing problems here is nearly free; fixing them after generation is expensive.
+
+**Narrative arc** — Does the deck tell a coherent story? Check that the sequence follows a logical flow, e.g.:
+- Product pitch: Problem → Solution → Proof → Action
+- Report: Context → Findings → Analysis → Recommendations
+- Training: Background → Concepts → Examples → Summary
+
+If the flow feels jumpy or sections are out of order, reorder now.
+
+**Visual variety map** — Write out the slide subtypes in sequence and look for runs:
+
+```
+Example (bad):  cover → TOC → text → text → text → text → summary
+Example (good): cover → TOC → divider → text → data → divider → comparison → text → summary
+```
+
+No more than 2 consecutive content slides with the same subtype. If you see a run of 3+ text slides, split them with a section divider or convert one to a data/comparison layout.
+
+**Content density balance** — Scan each slide's planned content. If any one slide has 3× more bullet points or items than adjacent slides, redistribute or cut. Dense slides will overflow; sparse slides waste space.
+
+**Required structure check**:
+- [ ] Deck has a Cover slide
+- [ ] If more than 5 slides: TOC is present
+- [ ] Each major section has a Section Divider
+- [ ] Deck ends with a Summary/Closing slide
+- [ ] Total slide count is appropriate for the context
+
+If any check fails, fix the outline before proceeding to Step 5.
+
 ### Step 5: Generate Slide JS Files
 
 Create one JS file per slide in `slides/` directory. Each file must export a synchronous `createSlide(pres, theme)` function. Follow the [Slide Output Format](#slide-output-format) and the type-specific guidance in [slide-types.md](references/slide-types.md). Generate up to 5 slides concurrently using subagents if available.
@@ -166,11 +197,21 @@ slides/
 
 ## Slide Output Format
 
-Each slide is a **complete, runnable JS file**:
+Each slide is a **complete, runnable JS file**.
+
+Before writing any code, fill in the DESIGN INTENT block at the top. This forces a layout decision before implementation and makes the Step 5.5 review much faster.
 
 ```javascript
 // slide-01.js
 const pptxgen = require("pptxgenjs");
+
+// DESIGN INTENT:
+//   Type    : cover
+//   Layout  : Asymmetric — left: title + subtitle + date, right: decorative shape block
+//   Focal   : Main title at y:1.8, fontSize:56, bold
+//   Zones   : Left text zone x:0.5–5.5 | Right visual zone x:5.8–9.8
+//   BG      : theme.bg (same as all content slides)
+//   Badge   : none (cover page)
 
 const slideConfig = {
   type: 'cover',
