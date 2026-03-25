@@ -29,7 +29,7 @@ Using a preset? Load the preset file — it contains its own complete page layou
 
 | Preset | File | Best for |
 |--------|------|----------|
-| 企业科技蓝 | [styles/corporate-tech-blue.md](references/styles/corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合，客户汇报型 |
+| 企业科技蓝（默认） | [corporate-tech-blue.md](references/corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合，客户汇报型 |
 
 ## Reference Files
 

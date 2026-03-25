@@ -22,7 +22,7 @@ Understand the user's needs before touching any code:
 
 | Preset | File | When to use |
 |--------|------|-------------|
-| 企业科技蓝 | [styles/corporate-tech-blue.md](styles/corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
+| 企业科技蓝 | [corporate-tech-blue.md](corporate-tech-blue.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
 
 When a preset is active:
 - Use its `theme` object directly
@@ -123,7 +123,7 @@ Before writing code for each content slide, identify the relationship between it
 | Client pain points / challenge cards | `addInfoCard()` |
 | Tabular comparison | `addColumnHeader()` + rows |
 
-All layout functions are defined in the active style preset (e.g. [styles/corporate-tech-blue.md](styles/corporate-tech-blue.md)). Every layout must fill `y: 1.05 – 5.0`; no large white spaces.
+All layout functions are defined in the active style preset (e.g. [corporate-tech-blue.md](corporate-tech-blue.md)). Every layout must fill `y: 1.05 – 5.0`; no large white spaces.
 
 ### Subagent parallelization
 
