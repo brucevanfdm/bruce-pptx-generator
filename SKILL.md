@@ -1,13 +1,12 @@
 ---
 name: bruce-pptx-generator
-description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Handles three scenarios: (1) create a presentation from scratch with PptxGenJS using a complete design system (color palettes, style recipes, 5 slide types); (2) edit an existing PPTX file via XML manipulation; (3) read or analyze a presentation with markitdown. Always invoke this skill before generating any slide code or touching any .pptx file."
+description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Handles two scenarios: (1) create a presentation from scratch with PptxGenJS using a complete design system (color palettes, style recipes, 5 slide types); (2) edit an existing PPTX file via XML manipulation. Always invoke this skill before generating any slide code or touching any .pptx file."
 license: MIT
 metadata:
   version: "2.0"
   category: productivity
   sources:
     - https://gitbrent.github.io/PptxGenJS/
-    - https://github.com/microsoft/markitdown
 ---
 
 # Bruce's PPTX Generator
@@ -18,7 +17,6 @@ Pick the right path based on the task, then load the listed files.
 
 | Task | Load these files |
 |------|-----------------|
-| **Read / analyze** existing PPTX | *(no extra files needed — see command below)* |
 | **Edit** existing PPTX from template | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md) |
 | **Create from scratch** with style preset | [workflow.md](references/workflow.md) + preset file + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
 | **Create from scratch** without preset | [workflow.md](references/workflow.md) + [custom-style-guide.md](references/custom-style-guide.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
@@ -40,12 +38,6 @@ Using a preset? Load the preset file — it contains its own complete page layou
 | [qa.md](references/qa.md) | Pre-compile checklist, post-compile QA, common mistakes |
 | [custom-style-guide.md](references/custom-style-guide.md) | Color palettes, style recipes, 5 page types (no preset path only) |
 | [editing.md](references/editing.md) | Template-based XML editing workflow |
-
-## Reading Content
-
-```shell
-python -m markitdown presentation.pptx
-```
 
 ## Mandatory Rules
 
@@ -79,6 +71,5 @@ Never use: `background`, `text`, `muted`, `darkest`, `lightest`, or any other ke
 ## Dependencies
 
 ```shell
-pip install "markitdown[pptx]"   # text extraction
-npm install -g pptxgenjs          # create from scratch
+npm install -g pptxgenjs
 ```
