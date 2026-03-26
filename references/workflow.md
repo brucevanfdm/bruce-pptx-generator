@@ -18,19 +18,52 @@ Understand the user's needs before touching any code:
 
 ## Step 2: Select Style
 
-**If the user specifies a style preset** → load the preset file and skip Step 3.
+**如果用户已明确指定风格** → 直接加载对应 preset 文件，跳到 Step 4。
 
-| Preset | File | When to use |
-|--------|------|-------------|
-| 企业科技蓝（默认） | [default-style.md](default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
+**如果用户没有指定风格** → 用 `AskUserQuestion` 问受众感受，一次提问包含所有信息：
+
+```
+Ask questions in ONE AskUserQuestion call:
+
+Question 1 (header: "演讲氛围"):
+  受众看完这份演示的感受是什么？
+  options:
+    - label: "权威可信"
+      description: "政企汇报、客户提案、正式场合 → 推荐：企业科技蓝"
+    - label: "创新进取"
+      description: "产品发布、技术演讲、AI 展示 → 推荐：暗黑科技"
+    - label: "简洁高效"
+      description: "内部报告、数据汇报、快速同步 → 推荐：简约白"
+    - label: "亲切温暖"
+      description: "培训课程、HR 沟通、团队分享 → 推荐：暖色商务"
+
+Question 2 (header: "内容深度"):
+  每张幻灯片的信息量定位？
+  options:
+    - label: "客户汇报型（看完即懂）"
+      description: "完整语义句，4–7 条，无需现场讲解"
+    - label: "演讲辅助型（配合讲解）"
+      description: "关键词 + 数字，3–5 条，演讲者补充细节"
+```
+
+收到答案后，告知推荐 preset 和理由，然后加载 preset 文件继续。
+
+### Preset 对照表
+
+| Preset | 氛围 | 文件 |
+|--------|------|------|
+| 企业科技蓝 | 权威、专业、可信 | [default-style.md](default-style.md) |
+| 暗黑科技 | 创新、前沿、冲击力 | [dark-tech-style.md](dark-tech-style.md) |
+| 简约白 | 克制、专业、数据优先 | [minimal-white-style.md](minimal-white-style.md) |
+| 暖色商务 | 亲切、温暖、易接受 | [warm-biz-style.md](warm-biz-style.md) |
 
 When a preset is active:
 - Use its `theme` object directly
 - Use its provided component functions (`addSlideTitleWithAccent`, `addTOCItem`, `addFeatureItem`, etc.)
-- Follow its content density rules (for 企业科技蓝: client briefing style, complete sentences, 4–7 items per slide)
+- Follow its content density rules
 - Its page-type guidance supersedes [custom-style-guide.md](custom-style-guide.md)
 
-**If no preset is specified** → use [custom-style-guide.md](custom-style-guide.md) to select a color palette.
+**If no preset matches the user's need** → use [custom-style-guide.md](custom-style-guide.md) to build a custom palette.
 
 ---
 
