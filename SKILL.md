@@ -26,13 +26,14 @@ Using a preset? Load the preset file — it contains its own complete page layou
 
 ### 风格选择流程
 
-**如果用户没有指定风格**，先用 `AskUserQuestion` 问受众感受，再映射到推荐 preset：
+**如果用户没有指定风格**，默认推荐**麦肯锡蓝**（最常用风格）。如需确认，可用 `AskUserQuestion` 问受众感受：
 
 Ask (header: "演讲氛围"):
 > 受众看完这份演示的感受是什么？
 
 | 选项 | description | 推荐 preset |
 | ---- | ----------- | ----------- |
+| 逻辑严密 | 战略汇报、咨询报告、管理层提案 | **麦肯锡蓝**（默认） |
 | 权威可信 | 政企汇报、客户提案、正式场合 | 企业科技蓝 |
 | 创新进取 | 产品发布、技术演讲、AI 展示 | 暗黑科技 |
 | 简洁高效 | 内部报告、数据汇报、快速同步 | 简约白 |
@@ -44,6 +45,7 @@ Ask (header: "演讲氛围"):
 
 | Preset | 氛围 | 字体组合 | 文件 | Best for |
 | ------ | ---- | -------- | ---- | -------- |
+| **麦肯锡蓝**（默认） | 权威、逻辑、顾问感 | Microsoft YaHei + Arial Black | [mckinsey-style.md](references/mckinsey-style.md) | 战略汇报、咨询报告、管理层提案、年度规划 |
 | 企业科技蓝 | 权威、专业、可信 | Microsoft YaHei + Arial | [default-style.md](references/default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
 | 暗黑科技 | 创新、前沿、冲击力 | Microsoft YaHei + Arial Black | [dark-tech-style.md](references/dark-tech-style.md) | 产品发布、技术演讲、AI 能力展示 |
 | 简约白 | 克制、专业、数据优先 | Microsoft YaHei + Arial | [minimal-white-style.md](references/minimal-white-style.md) | 内部报告、数据汇报、投资人 Deck |
@@ -56,6 +58,7 @@ Ask (header: "演讲氛围"):
 | [workflow.md](references/workflow.md)                     | Steps 1–7 creation workflow, outline review, compile script      |
 | [pptxgenjs.md](references/pptxgenjs.md)                   | Complete PptxGenJS API reference                                  |
 | [qa.md](references/qa.md)                                 | Pre-compile checklist, post-compile QA, common mistakes           |
+| [mckinsey-style.md](references/mckinsey-style.md)         | 麦肯锡蓝 preset：深蓝标题栏、Action Title、MECE 原则（默认风格） |
 | [custom-style-guide.md](references/custom-style-guide.md) | Color palettes, style recipes, 5 page types (no preset path only) |
 | [editing.md](references/editing.md)                       | Template-based XML editing workflow                               |
 
