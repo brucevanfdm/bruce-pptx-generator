@@ -24,14 +24,16 @@
 问题 1（标题："演讲氛围"）：
   受众看完这份演示的感受是什么？
   options:
-    - label: "权威可信"
-      description: "政企汇报、客户提案、正式场合 → 推荐：企业科技蓝"
+    - label: "逻辑严密"
+      description: "战略汇报、咨询报告、管理层提案 → 推荐：麦肯锡蓝（默认）"
+    - label: "打动人心"
+      description: "产品发布、Demo、Vision 演讲、对外路演 → 推荐：苹果极简"
+    - label: "卖动"
+      description: "融资路演、Roadmap 提案、Business Case → 推荐：Pitch Deck"
+    - label: "讲清"
+      description: "用研汇报、A/B 结果、OKR Review、指标会议 → 推荐：数据分析"
     - label: "创新进取"
-      description: "产品发布、技术演讲、AI 展示 → 推荐：暗黑科技"
-    - label: "简洁高效"
-      description: "内部报告、数据汇报、快速同步 → 推荐：简约白"
-    - label: "亲切温暖"
-      description: "培训课程、HR 沟通、团队分享 → 推荐：暖色商务"
+      description: "产品发布、技术演讲、AI 能力展示 → 推荐：暗黑科技"
 
 问题 2（标题："内容深度"）：
   每张幻灯片的信息量定位？
@@ -48,29 +50,16 @@
 
 | Preset | 氛围 | 文件 |
 |--------|------|------|
-| 企业科技蓝 | 权威、专业、可信 | [default-style.md](default-style.md) |
+| 麦肯锡蓝（默认） | 逻辑、权威、顾问感 | [mckinsey-style.md](mckinsey-style.md) |
+| 苹果极简 | 打动人心、视觉叙事 | [apple-minimal-style.md](apple-minimal-style.md) |
+| Pitch Deck | 卖动、说服、路演 | [pitch-deck-style.md](pitch-deck-style.md) |
+| 数据分析 | 讲清、数据优先 | [data-analysis-style.md](data-analysis-style.md) |
 | 暗黑科技 | 创新、前沿、冲击力 | [dark-tech-style.md](dark-tech-style.md) |
-| 简约白 | 克制、专业、数据优先 | [minimal-white-style.md](minimal-white-style.md) |
-| 暖色商务 | 亲切、温暖、易接受 | [warm-biz-style.md](warm-biz-style.md) |
 
 当某个 preset 生效时：
 - 直接使用其 `theme` 对象
-- 使用其提供的组件函数（`addSlideTitleWithAccent`、`addTOCItem`、`addFeatureItem` 等）
-- 遵循其内容密度规则
-- 其页面类型指导优先于 [custom-style-guide.md](custom-style-guide.md)
-
-**如果没有 preset 符合用户需求** → 使用 [custom-style-guide.md](custom-style-guide.md) 构建自定义调色板。
-
-## 第 3 步：选择设计风格（使用 preset 时跳过）
-
-使用 [custom-style-guide.md](custom-style-guide.md) 中的风格配方，从以下选项中选择一种：
-
-| 配方 | 感觉 | 适用场景 |
-|--------|------|---------|
-| Sharp | 现代、大胆、高对比 | 科技、金融、企业 |
-| Soft | 柔和、亲切 | 教育、医疗、HR |
-| Rounded | 友好、当代 | SaaS、初创、消费品 |
-| Pill | 活泼、充满活力 | 营销、活动、零售 |
+- 使用其提供的组件函数（各 preset 文件中定义）
+- 遵循其内容密度规则和 5 种页面类型
 
 ## 第 4 步：规划幻灯片大纲
 
@@ -84,7 +73,7 @@
 | Content | 主要内容幻灯片 — 所有变体 |
 | Summary | 结尾 — 关键要点、行动号召、致谢 |
 
-确保视觉多样性 — 不要在连续幻灯片中使用相同的内容布局。不使用 preset 时，请参阅 [custom-style-guide.md](custom-style-guide.md) 了解各类型的详细布局选项。
+确保视觉多样性 — 不要在连续幻灯片中使用相同的内容布局。各类型的详细布局选项请参阅当前 preset 文件的"5 种页面类型"章节。
 
 ## 第 4.5 步：大纲审查（写代码前必须完成）
 
@@ -130,21 +119,17 @@
 
 ### 图形布局选择（内容幻灯片）
 
-为每张内容幻灯片写代码前，先确定其条目之间的关系，再选择匹配的布局：
+为每张内容幻灯片写代码前，先确定其条目之间的关系，再从 preset 的"5 种页面类型 → Content"章节中选择匹配的布局：
 
-| 内容关系 | 使用的布局 |
+| 内容关系 | 布局方向 |
 |----------------------|---------------|
-| 条目并列 / 平等 / 无顺序 | G1 `addParallelCards()` |
-| 一个主概念 + 若干子条目 | G2 `addHierarchicalLayout()` |
-| 有明确顺序的步骤 | G3 `addFlowProcess()` |
-| 条目构成循环或迭代 | G4 `addCycleLayout()` |
-| 条目有层级 / 优先级 | G5 `addPyramid()` |
-| 带编号的功能列表 | `addFeatureItem()` |
-| KPI 指标 / 数据标注 | `addKPICard()` |
-| 客户痛点 / 挑战卡片 | `addInfoCard()` |
-| 表格对比 | `addColumnHeader()` + 行 |
+| 条目并列 / 平等 / 无顺序 | 横排卡片或多列布局 |
+| 一个主概念 + 若干子条目 | 顶部全宽主框 + 底部子卡片 |
+| 有明确顺序的步骤 | 横向流程箭头 |
+| KPI 指标 / 数据标注 | 横排 KPI 卡，大数字居中 |
+| 表格对比 | 表格行列，斑马行 |
 
-所有布局函数均在当前活跃的风格 preset 中定义（如 [corporate-tech-blue.md](corporate-tech-blue.md)）。每个布局必须填满 `y: 1.05 – 5.0`，不留大面积空白。
+使用 preset 文件中提供的组件函数（如 `addKPICard`、`addFeatureItem` 等）实现。每个布局必须填满 `y: 1.05 – 5.0`，不留大面积空白。
 
 ### subagents 并行化
 

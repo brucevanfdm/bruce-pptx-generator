@@ -159,16 +159,7 @@ slide.addImage({
 
 ### 图片尺寸模式
 
-```javascript
-// Contain — 适应容器内部，保持比例
-{ sizing: { type: 'contain', w: 4, h: 3 } }
-
-// Cover — 填满区域，保持比例（可能裁切）
-{ sizing: { type: 'cover', w: 4, h: 3 } }
-
-// Crop — 裁切特定区域
-{ sizing: { type: 'crop', x: 0.5, y: 0.5, w: 2, h: 2 } }
-```
+`sizing.type` 支持 `'contain'`（保持比例适应容器）、`'cover'`（填满裁切）、`'crop'`（指定裁切区域）。
 
 ### 计算尺寸（保持宽高比）
 
@@ -216,31 +207,6 @@ function createSlide(pres, theme, icons = {}) {
   return slide;
 }
 ```
-
-### 图标工具函数配置
-
-```javascript
-// icon-utils.js
-const React = require("react");
-const ReactDOMServer = require("react-dom/server");
-const sharp = require("sharp");
-
-function renderIconSvg(IconComponent, color = "#000000", size = 256) {
-  return ReactDOMServer.renderToStaticMarkup(
-    React.createElement(IconComponent, { color, size: String(size) })
-  );
-}
-
-async function iconToBase64Png(IconComponent, color, size = 256) {
-  const svg = renderIconSvg(IconComponent, color, size);
-  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
-  return "image/png;base64," + pngBuffer.toString("base64");
-}
-
-module.exports = { iconToBase64Png };
-```
-
-**注意**：使用 256 或更高的尺寸以获得清晰图标。size 参数控制光栅化分辨率，而非幻灯片上的显示尺寸（显示尺寸由 `w` 和 `h` 的英寸值决定）。
 
 ### 图标库
 
@@ -347,20 +313,6 @@ slide.addChart(pres.charts.BAR, chartData, {
 - `catGridLine/valGridLine: { color, style, size }` — 网格线（`style: "none"` 可隐藏）
 - `lineSmooth: true` — 曲线（折线图）
 - `legendPos: "r"` — 图例位置："b"、"t"、"l"、"r"、"tr"
-
-## 幻灯片母版
-
-```javascript
-pres.defineSlideMaster({
-  title: 'TITLE_SLIDE', background: { color: '283A5E' },
-  objects: [{
-    placeholder: { options: { name: 'title', type: 'title', x: 1, y: 2, w: 8, h: 2 } }
-  }]
-});
-
-let titleSlide = pres.addSlide({ masterName: "TITLE_SLIDE" });
-titleSlide.addText("My Title", { placeholder: "title" });
-```
 
 ## 常见陷阱
 

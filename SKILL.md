@@ -11,12 +11,11 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 | 任务                                        | 加载文件                                                                                                                                                    |
 | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **编辑**现有模板 PPTX               | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md)                                                                                     |
-| **从零创建**（使用风格预设）       | [workflow.md](references/workflow.md) + 预设文件 + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md)                                            |
-| **从零创建**（不使用预设）         | [workflow.md](references/workflow.md) + [custom-style-guide.md](references/custom-style-guide.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
+| **从零创建**（使用风格预设）       | [workflow.md](references/workflow.md) + 预设文件 + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
 
 ## 风格预设
 
-使用预设时，加载预设文件——其中包含完整的页面布局、组件函数、色板和内容密度规则。当预设激活时，**不需要**加载通用的 `custom-style-guide.md`。
+使用预设时，加载预设文件——其中包含完整的页面布局、组件函数、色板和内容密度规则。
 
 ### 风格选择
 
@@ -25,10 +24,10 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 | Preset | 受众感受 | 字体 | 文件 | 适用场景 |
 | ------ | -------- | ---- | ---- | -------- |
 | **麦肯锡蓝**（默认） | 逻辑严密 | YaHei + Arial Black | [mckinsey-style.md](references/mckinsey-style.md) | 战略汇报、咨询报告、管理层提案 |
-| 企业科技蓝 | 权威可信 | YaHei + Arial | [default-style.md](references/default-style.md) | 政企汇报、客户提案、正式场合 |
-| 暗黑科技 | 创新进取 | YaHei + Arial Black | [dark-tech-style.md](references/dark-tech-style.md) | 产品发布、技术演讲、AI 展示 |
-| 简约白 | 简洁高效 | YaHei + Arial | [minimal-white-style.md](references/minimal-white-style.md) | 内部报告、数据汇报、投资人 Deck |
-| 暖色商务 | 亲切温暖 | YaHei + Arial | [warm-biz-style.md](references/warm-biz-style.md) | 培训课程、HR 沟通、团队分享 |
+| 苹果极简 | 打动人心 | YaHei + Arial Black | [apple-minimal-style.md](references/apple-minimal-style.md) | 产品发布、Demo、Vision 演讲、对外路演 |
+| Pitch Deck | 卖动 | YaHei + Arial Black | [pitch-deck-style.md](references/pitch-deck-style.md) | 融资路演、Roadmap 提案、Business Case |
+| 数据分析 | 讲清 | YaHei + Arial Black | [data-analysis-style.md](references/data-analysis-style.md) | 用研汇报、A/B 结果、OKR Review、指标会议 |
+| 暗黑科技 | 创新进取 | YaHei + Arial Black | [dark-tech-style.md](references/dark-tech-style.md) | 产品发布、技术演讲、AI 能力展示 |
 
 告知用户推荐的 preset 并说明理由，然后进入工作流。如果用户不满意，允许手动选择。
 
