@@ -1,9 +1,6 @@
 ---
 name: bruce-pptx-generator
-description: "只要用户提到 PPT、PPTX、PowerPoint、演示文稿、幻灯片或 Deck，无论语气是否正式，都必须使用本技能。处理两种场景：(1) 使用 PptxGenJS 从零创建演示文稿，内置完整设计系统（色板、风格方案、5 种幻灯片类型）；(2) 通过 XML 操作编辑现有 PPTX 文件。在生成任何幻灯片代码或修改任何 .pptx 文件前，必须先调用本技能。"
-license: MIT
-metadata:
-  version: "4.0"
+description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Always invoke this skill before generating any slide code or touching any .pptx file."
 ---
 # Bruce 的 PPTX 生成器
 
@@ -21,43 +18,19 @@ metadata:
 
 使用预设时，加载预设文件——其中包含完整的页面布局、组件函数、色板和内容密度规则。当预设激活时，**不需要**加载通用的 `custom-style-guide.md`。
 
-### 风格选择流程
+### 风格选择
 
-**如果用户没有指定风格**，默认推荐**麦肯锡蓝**（最常用风格）。如需确认，可用 `AskUserQuestion` 问受众感受：
+**如果用户没有指定风格**，默认推荐**麦肯锡蓝**。如需确认，可用 `AskUserQuestion` 问：受众看完这份演示的感受是什么？
 
-Ask (header: "演讲氛围"):
-> 受众看完这份演示的感受是什么？
-
-| 选项 | 说明 | 推荐 preset |
-| ---- | ----------- | ----------- |
-| 逻辑严密 | 战略汇报、咨询报告、管理层提案 | **麦肯锡蓝**（默认） |
-| 权威可信 | 政企汇报、客户提案、正式场合 | 企业科技蓝 |
-| 创新进取 | 产品发布、技术演讲、AI 展示 | 暗黑科技 |
-| 简洁高效 | 内部报告、数据汇报、快速同步 | 简约白 |
-| 亲切温暖 | 培训课程、HR 沟通、团队分享 | 暖色商务 |
+| Preset | 受众感受 | 字体 | 文件 | 适用场景 |
+| ------ | -------- | ---- | ---- | -------- |
+| **麦肯锡蓝**（默认） | 逻辑严密 | YaHei + Arial Black | [mckinsey-style.md](references/mckinsey-style.md) | 战略汇报、咨询报告、管理层提案 |
+| 企业科技蓝 | 权威可信 | YaHei + Arial | [default-style.md](references/default-style.md) | 政企汇报、客户提案、正式场合 |
+| 暗黑科技 | 创新进取 | YaHei + Arial Black | [dark-tech-style.md](references/dark-tech-style.md) | 产品发布、技术演讲、AI 展示 |
+| 简约白 | 简洁高效 | YaHei + Arial | [minimal-white-style.md](references/minimal-white-style.md) | 内部报告、数据汇报、投资人 Deck |
+| 暖色商务 | 亲切温暖 | YaHei + Arial | [warm-biz-style.md](references/warm-biz-style.md) | 培训课程、HR 沟通、团队分享 |
 
 告知用户推荐的 preset 并说明理由，然后进入工作流。如果用户不满意，允许手动选择。
-
-### Preset 列表
-
-| Preset | 氛围 | 字体组合 | 文件 | 适用场景 |
-| ------ | ---- | -------- | ---- | -------- |
-| **麦肯锡蓝**（默认） | 权威、逻辑、顾问感 | Microsoft YaHei + Arial Black | [mckinsey-style.md](references/mckinsey-style.md) | 战略汇报、咨询报告、管理层提案、年度规划 |
-| 企业科技蓝 | 权威、专业、可信 | Microsoft YaHei + Arial | [default-style.md](references/default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
-| 暗黑科技 | 创新、前沿、冲击力 | Microsoft YaHei + Arial Black | [dark-tech-style.md](references/dark-tech-style.md) | 产品发布、技术演讲、AI 能力展示 |
-| 简约白 | 克制、专业、数据优先 | Microsoft YaHei + Arial | [minimal-white-style.md](references/minimal-white-style.md) | 内部报告、数据汇报、投资人 Deck |
-| 暖色商务 | 亲切、温暖、易接受 | Microsoft YaHei + Arial | [warm-biz-style.md](references/warm-biz-style.md) | 培训课程、HR 沟通、企业文化分享 |
-
-## 参考文件
-
-| 文件                                                   | 用途                                                              |
-| ------------------------------------------------------ | ----------------------------------------------------------------- |
-| [workflow.md](references/workflow.md)                     | 第 1–7 步创建工作流、大纲评审、编译脚本                         |
-| [pptxgenjs.md](references/pptxgenjs.md)                   | 完整的 PptxGenJS API 参考                                        |
-| [qa.md](references/qa.md)                                 | 编译前检查清单、编译后质量检查、常见错误                         |
-| [mckinsey-style.md](references/mckinsey-style.md)         | 麦肯锡蓝 preset：深蓝标题栏、Action Title、MECE 原则（默认风格） |
-| [custom-style-guide.md](references/custom-style-guide.md) | 色板、风格方案、5 种页面类型（仅限非预设路径使用）               |
-| [editing.md](references/editing.md)                       | 基于模板的 XML 编辑工作流                                        |
 
 ## 强制规则
 
