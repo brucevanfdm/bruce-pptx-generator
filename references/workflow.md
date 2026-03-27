@@ -1,31 +1,27 @@
-# PPTX Creation Workflow (Steps 1–7)
+# PPTX 制作流程（第 1–7 步）
 
-End-to-end guide for creating a presentation from scratch with PptxGenJS.
+使用 PptxGenJS 从零开始创建演示文稿的完整指南。
 
----
+## 第 1 步：调研与需求确认
 
-## Step 1: Research & Requirements
+在动手写代码之前，先理解用户的需求：
+- **主题** — 演示文稿讲的是什么？
+- **受众** — 谁来看？（客户汇报、内部报告、投资人路演？）
+- **目的** — 告知、说服，还是培训？
+- **语气** — 正式 / 轻松 / 技术性？
+- **内容深度** — 每张幻灯片的信息量？（汇报型 vs 演讲辅助型）
+- **幻灯片数量** — 大致目标
 
-Understand the user's needs before touching any code:
-- **Topic** — what is the presentation about?
-- **Audience** — who will read it? (client briefing, internal report, investor pitch?)
-- **Purpose** — inform, persuade, instruct?
-- **Tone** — formal / casual / technical?
-- **Content depth** — how much detail per slide? (汇报型 vs 演讲辅助型)
-- **Slide count** — rough target
+## 第 2 步：选择风格
 
----
-
-## Step 2: Select Style
-
-**如果用户已明确指定风格** → 直接加载对应 preset 文件，跳到 Step 4。
+**如果用户已明确指定风格** → 直接加载对应 preset 文件，跳到第 4 步。
 
 **如果用户没有指定风格** → 用 `AskUserQuestion` 问受众感受，一次提问包含所有信息：
 
 ```
-Ask questions in ONE AskUserQuestion call:
+在一次 AskUserQuestion 调用中提问所有问题：
 
-Question 1 (header: "演讲氛围"):
+问题 1（标题："演讲氛围"）：
   受众看完这份演示的感受是什么？
   options:
     - label: "权威可信"
@@ -37,7 +33,7 @@ Question 1 (header: "演讲氛围"):
     - label: "亲切温暖"
       description: "培训课程、HR 沟通、团队分享 → 推荐：暖色商务"
 
-Question 2 (header: "内容深度"):
+问题 2（标题："内容深度"）：
   每张幻灯片的信息量定位？
   options:
     - label: "客户汇报型（看完即懂）"
@@ -57,146 +53,138 @@ Question 2 (header: "内容深度"):
 | 简约白 | 克制、专业、数据优先 | [minimal-white-style.md](minimal-white-style.md) |
 | 暖色商务 | 亲切、温暖、易接受 | [warm-biz-style.md](warm-biz-style.md) |
 
-When a preset is active:
-- Use its `theme` object directly
-- Use its provided component functions (`addSlideTitleWithAccent`, `addTOCItem`, `addFeatureItem`, etc.)
-- Follow its content density rules
-- Its page-type guidance supersedes [custom-style-guide.md](custom-style-guide.md)
+当某个 preset 生效时：
+- 直接使用其 `theme` 对象
+- 使用其提供的组件函数（`addSlideTitleWithAccent`、`addTOCItem`、`addFeatureItem` 等）
+- 遵循其内容密度规则
+- 其页面类型指导优先于 [custom-style-guide.md](custom-style-guide.md)
 
-**If no preset matches the user's need** → use [custom-style-guide.md](custom-style-guide.md) to build a custom palette.
+**如果没有 preset 符合用户需求** → 使用 [custom-style-guide.md](custom-style-guide.md) 构建自定义调色板。
 
----
+## 第 3 步：选择设计风格（使用 preset 时跳过）
 
-## Step 3: Select Design Style (skip if using a preset)
+使用 [custom-style-guide.md](custom-style-guide.md) 中的风格配方，从以下选项中选择一种：
 
-Use [custom-style-guide.md](custom-style-guide.md) Style Recipes to choose one of:
-
-| Recipe | Feel | Best for |
+| 配方 | 感觉 | 适用场景 |
 |--------|------|---------|
-| Sharp | Modern, bold, high-contrast | Tech, finance, corporate |
-| Soft | Gentle, approachable | Education, healthcare, HR |
-| Rounded | Friendly, contemporary | SaaS, startups, consumer |
-| Pill | Playful, energetic | Marketing, events, retail |
+| Sharp | 现代、大胆、高对比 | 科技、金融、企业 |
+| Soft | 柔和、亲切 | 教育、医疗、HR |
+| Rounded | 友好、当代 | SaaS、初创、消费品 |
+| Pill | 活泼、充满活力 | 营销、活动、零售 |
 
----
+## 第 4 步：规划幻灯片大纲
 
-## Step 4: Plan Slide Outline
+将**每张幻灯片**精确归类为以下 5 种页面类型之一：
 
-Classify **every slide** as exactly one of the 5 page types:
-
-| Type | Purpose |
+| 类型 | 用途 |
 |------|---------|
-| Cover | Opening slide — title, subtitle, date/presenter |
-| TOC | Table of contents — section overview |
-| Section Divider | Chapter break between major sections |
-| Content | Main information slides — all variants |
-| Summary | Closing — key takeaways, CTA, thank-you |
+| Cover | 开场幻灯片 — 标题、副标题、日期/演讲者 |
+| TOC | 目录 — 章节概览 |
+| Section Divider | 主要章节之间的分隔页 |
+| Content | 主要内容幻灯片 — 所有变体 |
+| Summary | 结尾 — 关键要点、行动号召、致谢 |
 
-Ensure visual variety — do NOT use the same content layout on consecutive slides. See [custom-style-guide.md](custom-style-guide.md) for detailed layout options per type (when not using a preset).
+确保视觉多样性 — 不要在连续幻灯片中使用相同的内容布局。不使用 preset 时，请参阅 [custom-style-guide.md](custom-style-guide.md) 了解各类型的详细布局选项。
 
----
+## 第 4.5 步：大纲审查（写代码前必须完成）
 
-## Step 4.5: Outline Review (REQUIRED before writing any code)
+在此阶段修复问题几乎零成本，生成后再修复代价高昂。
 
-Fixing problems here is nearly free. Fixing them after generation is expensive.
+### 叙事弧线检查
 
-### Narrative arc check
+整个 deck 是否讲述了一个连贯的故事？常见模式：
+- 客户汇报：问题 → 解决方案 → 证明 → 行动
+- 产品报告：背景 → 发现 → 分析 → 建议
+- 培训：背景 → 概念 → 示例 → 总结
 
-Does the deck tell a coherent story? Common patterns:
-- Client briefing: Problem → Solution → Proof → Action
-- Product report: Context → Findings → Analysis → Recommendations
-- Training: Background → Concepts → Examples → Summary
+如果顺序感觉跳跃，现在就调整。
 
-If the sequence feels jumpy, reorder now.
+### 视觉多样性映射
 
-### Visual variety map
-
-Write out the slide subtypes in sequence and scan for runs:
+按顺序列出幻灯片子类型，检查是否有连续重复：
 
 ```
-Bad:  cover → TOC → text → text → text → text → summary
-Good: cover → TOC → divider → text → data → divider → comparison → text → summary
+差：  cover → TOC → text → text → text → text → summary
+好：  cover → TOC → divider → text → data → divider → comparison → text → summary
 ```
 
-No more than 2 consecutive content slides with the same subtype.
+相同子类型的内容幻灯片不得连续超过 2 张。
 
-### Content density balance
+### 内容密度平衡
 
-Scan each slide's planned content. If any slide has 3× more items than its neighbors, redistribute or split. Dense slides overflow; sparse slides waste space.
+扫描每张幻灯片的计划内容。如果某张幻灯片的条目是相邻幻灯片的 3 倍，应重新分配或拆分。密度过高的幻灯片会溢出，密度过低的幻灯片浪费空间。
 
-### Required structure checklist
+### 必要结构检查清单
 
-- [ ] Deck has a Cover slide
-- [ ] If more than 5 slides: TOC is present
-- [ ] Each major section has a Section Divider
-- [ ] Deck ends with a Summary/Closing slide
-- [ ] Total slide count is appropriate for context
+- [ ] deck 有封面幻灯片
+- [ ] 超过 5 张幻灯片时：包含目录
+- [ ] 每个主要章节有章节分隔页
+- [ ] deck 以总结/结尾幻灯片收尾
+- [ ] 幻灯片总数与场景相符
 
-Fix any failures before proceeding to Step 5.
+进入第 5 步前修复所有不符合项。
 
----
+## 第 5 步：生成幻灯片 JS 文件
 
-## Step 5: Generate Slide JS Files
+在 `slides/` 中为每张幻灯片创建一个 JS 文件，每个文件导出一个同步的 `createSlide(pres, theme)` 函数。
 
-Create one JS file per slide in `slides/`. Each file exports a synchronous `createSlide(pres, theme)` function.
+### 图形布局选择（内容幻灯片）
 
-### Graphic Layout Selection (content slides)
+为每张内容幻灯片写代码前，先确定其条目之间的关系，再选择匹配的布局：
 
-Before writing code for each content slide, identify the relationship between its items, then pick the matching layout:
-
-| Content relationship | Layout to use |
+| 内容关系 | 使用的布局 |
 |----------------------|---------------|
-| Items are parallel / equal / no order | G1 `addParallelCards()` |
-| One main concept with sub-items | G2 `addHierarchicalLayout()` |
-| Steps with a defined sequence | G3 `addFlowProcess()` |
-| Items form a cycle or iterate | G4 `addCycleLayout()` |
-| Items have hierarchy / priority levels | G5 `addPyramid()` |
-| Numbered feature list | `addFeatureItem()` |
-| KPI metrics / data callouts | `addKPICard()` |
-| Client pain points / challenge cards | `addInfoCard()` |
-| Tabular comparison | `addColumnHeader()` + rows |
+| 条目并列 / 平等 / 无顺序 | G1 `addParallelCards()` |
+| 一个主概念 + 若干子条目 | G2 `addHierarchicalLayout()` |
+| 有明确顺序的步骤 | G3 `addFlowProcess()` |
+| 条目构成循环或迭代 | G4 `addCycleLayout()` |
+| 条目有层级 / 优先级 | G5 `addPyramid()` |
+| 带编号的功能列表 | `addFeatureItem()` |
+| KPI 指标 / 数据标注 | `addKPICard()` |
+| 客户痛点 / 挑战卡片 | `addInfoCard()` |
+| 表格对比 | `addColumnHeader()` + 行 |
 
-All layout functions are defined in the active style preset (e.g. [corporate-tech-blue.md](corporate-tech-blue.md)). Every layout must fill `y: 1.05 – 5.0`; no large white spaces.
+所有布局函数均在当前活跃的风格 preset 中定义（如 [corporate-tech-blue.md](corporate-tech-blue.md)）。每个布局必须填满 `y: 1.05 – 5.0`，不留大面积空白。
 
-### Subagent parallelization
+### subagents 并行化
 
-Generate up to 5 slides concurrently using subagents. Tell each subagent:
+使用 subagents 并行生成最多 5 张幻灯片。告知每个 subagent：
 
-1. File path: `slides/slide-01.js`, `slides/slide-02.js`, etc.
-2. Images: `slides/imgs/`
-3. Final PPTX: `slides/output/`
-4. Dimensions: 10" × 5.625" (LAYOUT_16x9)
-5. Fonts: Chinese = `Microsoft YaHei`, English = `Arial`
-6. Colors: 6-char hex without `#`
-7. Theme object contract: only 5 keys (`primary`, `secondary`, `accent`, `light`, `bg`)
-8. Must follow [pptxgenjs.md](pptxgenjs.md)
+1. 文件路径：`slides/slide-01.js`、`slides/slide-02.js` 等
+2. 图片目录：`slides/imgs/`
+3. 最终 PPTX：`slides/output/`
+4. 尺寸：10" × 5.625"（LAYOUT_16x9）
+5. 字体：中文 = `Microsoft YaHei`，英文 = `Arial`
+6. 颜色：6 位十六进制，不带 `#`
+7. theme 对象约定：仅 5 个键（`primary`、`secondary`、`accent`、`light`、`bg`）
+8. 必须遵循 [pptxgenjs.md](pptxgenjs.md)
 
-### Slide file format
+### 幻灯片文件格式
 
-Every slide file must include a DESIGN INTENT block before any code:
+每个幻灯片文件必须在代码前包含 DESIGN INTENT 块：
 
 ```javascript
 // slide-03.js
 const pptxgen = require("pptxgenjs");
 
 // DESIGN INTENT:
-//   Type    : content
-//   Layout  : G2 总分布局 — top full-width main concept, bottom 3 sub-cards
-//   Focal   : Main box at y:1.05 h:1.1 (dark blue, white text)
-//   Zones   : Main box x:0.45–9.55 | Sub-cards 3-col below y:2.65
-//   BG      : theme.bg (FFFFFF, same as all content slides)
-//   Badge   : slide 03
+//   类型    : content（内容页）
+//   布局  : G2 总分布局 — 顶部全宽主概念，底部 3 个子卡片
+//   焦点   : 主框在 y:1.05 h:1.1（深蓝色，白色文字）
+//   区域   : 主框 x:0.45–9.55 | 子卡片 3 列，位于 y:2.65 以下
+//   背景      : theme.bg（FFFFFF，与所有内容页一致）
+//   页码标记   : slide 03
 
 function createSlide(pres, theme) {
   const slide = pres.addSlide();
   slide.background = { color: theme.bg };
 
-  // ... slide code here ...
+  // ... 幻灯片代码 ...
 
   return slide;
 }
 
-// Standalone preview
+// 独立预览
 if (require.main === module) {
   const pres = new pptxgen();
   pres.layout = 'LAYOUT_16x9';
@@ -211,30 +199,26 @@ if (require.main === module) {
 module.exports = { createSlide };
 ```
 
----
+## 第 5.5 步：编译前代码审查（必须完成）
 
-## Step 5.5: Pre-Compile Code Review (REQUIRED)
+编译前审查每个幻灯片 JS 文件。明确写出发现的问题，不要悄悄修复。
 
-Review every slide JS file before compiling. Write out findings explicitly — do not silently fix.
+逐张幻灯片检查：
 
-Check each slide for:
+1. **边界** — 每个元素满足 `x + w ≤ 10` 且 `y + h ≤ 5.625`
+2. **重叠** — 元素之间无非预期碰撞
+3. **背景一致性** — 所有内容幻灯片使用完全相同的背景值
+4. **字体合规** — 仅使用 `Microsoft YaHei` 和所选英文字体
+5. **颜色合规** — 仅使用 `theme.*` 值；除 `"FFFFFF"` / `"000000"` 外不使用原始十六进制；不带 `"#"` 前缀
+6. **页码标记** — 每张非封面幻灯片的正确位置均有页码标记
 
-1. **Bounds** — `x + w ≤ 10` and `y + h ≤ 5.625` for every element
-2. **Overlaps** — no unintended collisions between elements
-3. **Background consistency** — all content slides use the exact same background value
-4. **Font compliance** — only `Microsoft YaHei` and the chosen English font
-5. **Color compliance** — only `theme.*` values; no raw hex except `"FFFFFF"` / `"000000"`; no `"#"` prefix
-6. **Page badge** — present on every non-cover slide at correct position
+详细的逐项检查指南和跨幻灯片一致性矩阵请参阅 [qa.md](qa.md)。
 
-See [qa.md](qa.md) for detailed per-check guidance and the cross-slide consistency matrix.
+进入第 6 步前修复所有问题。
 
-Fix all issues before moving to Step 6.
+## 第 6 步：编译为最终 PPTX
 
----
-
-## Step 6: Compile into Final PPTX
-
-Create `slides/compile.js`:
+创建 `slides/compile.js`：
 
 ```javascript
 // slides/compile.js
@@ -245,8 +229,8 @@ const path = require('path');
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_16x9';
 
-// ── Theme: replace with the palette chosen in Step 2 ──────────────────────
-// Example: 企业科技蓝
+// ── 主题：替换为第 2 步选定的调色板 ──────────────────────
+// 示例：企业科技蓝
 const theme = {
   primary:   "1A3C6E",
   secondary: "1E88E5",
@@ -255,7 +239,7 @@ const theme = {
   bg:        "FFFFFF",
 };
 
-// ── Auto-discover slide files in order ────────────────────────────────────
+// ── 按顺序自动发现幻灯片文件 ────────────────────────────────────
 const slideFiles = fs.readdirSync(__dirname)
   .filter(f => /^slide-\d+\.js$/.test(f))
   .sort();
@@ -265,39 +249,35 @@ for (const file of slideFiles) {
   mod.createSlide(pres, theme);
 }
 
-// ── Output ────────────────────────────────────────────────────────────────
+// ── 输出 ────────────────────────────────────────────────────────────────
 fs.mkdirSync(path.join(__dirname, 'output'), { recursive: true });
 pres.writeFile({ fileName: path.join(__dirname, 'output', 'presentation.pptx') });
 console.log('Done → slides/output/presentation.pptx');
 ```
 
-Run with:
+运行命令：
 
 ```shell
 cd slides && node compile.js
 ```
 
----
+## 第 7 步：质量检查（必须完成）
 
-## Step 7: QA (Required)
+完整的编译后质量检查流程请参阅 [qa.md](qa.md)。
 
-See [qa.md](qa.md) for the full post-compile QA process.
+**在完成至少一轮修复并验证之前，不得宣布成功。**
 
-**Never declare success without completing at least one fix-and-verify cycle.**
-
----
-
-## Output Structure
+## 输出结构
 
 ```
 slides/
-├── slide-01.js      # Cover
-├── slide-02.js      # TOC
-├── slide-03.js      # Section Divider
-├── slide-04.js      # Content
+├── slide-01.js      # 封面
+├── slide-02.js      # 目录
+├── slide-03.js      # 章节分隔页
+├── slide-04.js      # 内容页
 ├── ...
-├── compile.js       # Assembles all slides into PPTX
-├── imgs/            # Images referenced by slides
+├── compile.js       # 将所有幻灯片组合为 PPTX
+├── imgs/            # 幻灯片引用的图片
 └── output/
     └── presentation.pptx
 ```

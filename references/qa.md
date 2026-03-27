@@ -1,34 +1,32 @@
-# QA Checklist & Common Mistakes
+# QA 检查清单与常见错误
 
-For API-level pitfalls (hex color format, reusing option objects, etc.) see [pptxgenjs.md](pptxgenjs.md#common-pitfalls).
+API 层面的陷阱（十六进制颜色格式、复用选项对象等），请参阅 [pptxgenjs.md](pptxgenjs.md#common-pitfalls)。
 
----
+## 编译前代码审查（第 5.5 步）
 
-## Pre-Compile Code Review (Step 5.5)
+在编译之前执行此步骤。由于无法直接看到渲染结果，必须在代码阶段提前发现布局问题。
 
-Run this before compiling. You cannot see rendered output, so catch layout bugs in code now.
+逐一检查每个幻灯片 JS 文件，核对以下每一项。**将所有发现的问题写下来——不要悄悄修复。**
 
-Go through every slide JS file and check each item below. **Write down every issue found — do not fix silently.**
+### 1. 边界检查
 
-### 1. Bounds Check
-
-Slide canvas: **10" wide × 5.625" tall**. Every element must satisfy:
+幻灯片画布尺寸：**宽 10 英寸 × 高 5.625 英寸**。每个元素必须满足：
 
 ```
 x >= 0  AND  x + w <= 10
 y >= 0  AND  y + h <= 5.625
 ```
 
-Common traps:
-- Shape at `x:0.5, w:9.8` → right edge = 10.3 ✗ overflows
-- Text at `y:5.0, h:0.8` → bottom = 5.8 ✗ overflows
-- Page badge at `x:9.3, w:0.4` → right edge = 9.7 ✓
+常见陷阱：
+- 形状 `x:0.5, w:9.8` → 右边缘 = 10.3 ✗ 溢出
+- 文本 `y:5.0, h:0.8` → 底部 = 5.8 ✗ 溢出
+- 页码标记 `x:9.3, w:0.4` → 右边缘 = 9.7 ✓
 
-**Flag any element where `x+w > 10` or `y+h > 5.625`.**
+**标记所有 `x+w > 10` 或 `y+h > 5.625` 的元素。**
 
-### 2. Overlap Check
+### 2. 重叠检查
 
-For each slide, check for unintended overlaps. Two elements overlap when:
+对每张幻灯片，检查是否存在非预期的重叠。两个元素发生重叠的条件：
 
 ```
 A.x < B.x+B.w  AND  A.x+A.w > B.x
@@ -36,81 +34,81 @@ AND
 A.y < B.y+B.h  AND  A.y+A.h > B.y
 ```
 
-Intentional overlaps (text on a background shape) are fine. Flag these unintended cases:
-- Two text boxes at similar x/y that would obscure each other
-- A shape covering a text element it shouldn't
-- Body content reaching past `y:5.0` (badge lives at `y:5.1`)
+有意为之的重叠（如背景形状上的文本）是允许的。以下非预期情况需标记：
+- 两个文本框位置相近，会相互遮挡
+- 某形状覆盖了不应被遮挡的文本元素
+- 正文内容超过 `y:5.0`（页码标记位于 `y:5.1`）
 
-### 3. Background Consistency
+### 3. 背景一致性
 
-All slides of the same type must share the exact same background:
+相同类型的幻灯片必须使用完全一致的背景：
 
-| Slide type | Expected background |
-|------------|---------------------|
-| Cover | One consistent choice for the whole deck |
-| TOC | Consistent with Cover or a designated variant |
-| Section Divider | **All dividers use the same value** |
-| Content pages | **All content pages must be identical** |
-| Summary | Matches Cover or a designated closing style |
+| 幻灯片类型 | 预期背景 |
+|------------|----------|
+| 封面 | 整套 PPT 统一使用同一选择 |
+| 目录 | 与封面一致，或使用指定变体 |
+| 章节分隔页 | **所有分隔页使用相同值** |
+| 内容页 | **所有内容页必须完全一致** |
+| 总结页 | 与封面或指定结尾风格保持一致 |
 
-Common failure: one content slide uses `theme.bg`, another uses `"FFFFFF"` — visually identical now but breaks if the theme changes.
+常见问题：某内容页使用 `theme.bg`，另一页使用 `"FFFFFF"` —— 当前视觉效果相同，但一旦 theme 变更就会出错。
 
-**Fix**: define backgrounds once in `compile.js` and pass them through:
+**修复方式**：在 `compile.js` 中统一定义背景，再传入各页：
 
 ```javascript
 const backgrounds = {
   cover:   theme.bg,
   toc:     theme.bg,
   divider: "EEF6FF",
-  content: "FFFFFF",   // ALL content pages must use this exact string
+  content: "FFFFFF",   // 所有内容页必须使用这个完全相同的字符串
   summary: theme.bg,
 };
 ```
 
-### 4. Font Compliance
+### 4. 字体合规检查
 
-Scan every `fontFace` value. All should be:
-- `"Microsoft YaHei"` — Chinese or mixed content
-- The chosen English font (`"Arial"`, `"Georgia"`, etc.)
+扫描每一个 `fontFace` 值，应全部为：
+- `"Microsoft YaHei"` — 中文或中英混排内容
+- 指定的英文字体（`"Arial"`、`"Georgia"` 等）
 
-Flag any unexpected font name.
+标记任何不在预期范围内的字体名称。
 
-### 5. Color Compliance
+### 5. 颜色合规检查
 
-- Every color should come from `theme.*`
-- Exceptions allowed: `"FFFFFF"` (white), `"000000"` (black)
-- **No `"#"` prefix anywhere** — `"#FF0000"` corrupts the file
-- No 8-char hex strings encoding opacity — use the `opacity` property
+- 所有颜色应来自 `theme.*`
+- 允许例外：`"FFFFFF"`（白色）、`"000000"`（黑色）
+- **任何地方不得使用 `"#"` 前缀** — `"#FF0000"` 会导致文件损坏
+- 不得使用 8 位十六进制字符串来编码透明度 — 请使用 `opacity` 属性
 
-### 6. Page Badge
+### 6. 页码标记
 
-Every slide except Cover must have a page badge. Check:
-- Badge is present
-- Badge shows the correct sequential number
-- Position: `x:9.3, y:5.1, w:0.4, h:0.4` (circle) or `x:9.1, y:5.15, w:0.6, h:0.35` (pill)
+除封面外，每张幻灯片都必须有页码标记。检查：
+- 标记是否存在
+- 标记显示的编号是否按顺序正确
+- 位置：`x:9.3, y:5.1, w:0.4, h:0.4`（圆形）或 `x:9.1, y:5.15, w:0.6, h:0.35`（胶囊形）
 
-### 7. Title Structure
+### 7. 标题结构
 
-For each content / TOC / summary slide:
-- Title `y` position is consistent across all content slides (e.g. `y:0.22`)
-- Title uses `bold: true` and `color: theme.primary`
-- If the style requires an accent bar (e.g. 企业科技蓝 orange line), it is present below the title
+对每张内容页 / 目录页 / 总结页：
+- 标题 `y` 位置在所有内容页中保持一致（例如 `y:0.22`）
+- 标题使用 `bold: true` 和 `color: theme.primary`
+- 若风格要求带强调条（如企业科技蓝的橙色线条），该线条应位于标题下方
 
-### 8. Cross-Slide Consistency Matrix
+### 8. 跨页一致性矩阵
 
-After individual checks, do one cross-slide pass. Build a table:
+完成单页检查后，进行一次跨页整体审查。构建如下表格：
 
-| Slide | Type | Title y | fontSize | Content start y | Background |
-|-------|------|---------|----------|-----------------|------------|
+| 幻灯片 | 类型 | 标题 y | fontSize | 内容起始 y | 背景 |
+|--------|------|--------|----------|------------|------|
 | 01 | cover | — | — | — | `theme.bg` |
 | 02 | toc | 0.22 | 28 | 0.9 | `theme.bg` |
 | 03 | divider | — | — | — | `EEF6FF` |
 | 04 | content | 0.22 | 28 | 1.05 | `FFFFFF` |
-| 05 | content | **0.30** | **26** | 1.05 | `FFFFFF` ← **flag: y and fontSize differ** |
+| 05 | content | **0.30** | **26** | 1.05 | `FFFFFF` ← **标记：y 和 fontSize 不一致** |
 
-Flag any same-type slides where these values differ.
+标记同类型幻灯片中上述值有差异的情况。
 
-### How to report findings
+### 问题报告格式
 
 ```
 slide-04.js: shape x:0.5 w:9.8 → right=10.3 → OVERFLOW, change w to 9.5
@@ -119,66 +117,62 @@ slide-06.js: page badge missing → ADD BADGE
 slide-07.js: title y:0.30 but others are y:0.22 → TITLE DRIFT
 ```
 
-Fix all flagged issues before compiling.
+在编译前修复所有已标记的问题。
 
----
+## 编译后 QA
 
-## Post-Compile QA
+**默认假设存在问题。你的任务是找出它们。**
 
-**Assume there are problems. Your job is to find them.**
+第一次渲染几乎不会完全正确。将 QA 作为 bug 排查过程来对待，而非确认步骤。
 
-Your first render is almost never correct. Approach QA as a bug hunt, not a confirmation step.
-
-### Content extraction
+### 内容提取
 
 ```bash
 python -m markitdown output.pptx
 ```
 
-Check for: missing content, wrong order, truncated text.
+检查：内容缺失、顺序错误、文本截断。
 
-### Leftover placeholder check
+### 占位符残留检查
 
 ```bash
 python -m markitdown output.pptx | grep -iE "xxxx|lorem|ipsum|placeholder|TODO"
 ```
 
-If this returns results, fix before declaring success.
+如果有返回结果，修复后才能宣告完成。
 
-### Verification loop
+### 验证循环
 
-1. Compile → extract with markitdown → review content
-2. **List issues found** — if none found, look again more critically
-3. Fix source JS files → recompile
-4. Re-verify affected slides — one fix often creates another problem
-5. Repeat until a full pass reveals no new issues
+1. 编译 → 使用 markitdown 提取 → 审查内容
+2. **列出发现的问题** — 如果没有发现，再更仔细地检查一遍
+3. 修复源 JS 文件 → 重新编译
+4. 重新验证受影响的幻灯片 — 一处修复往往会引发另一处问题
+5. 重复循环，直到完整检查一遍后不再出现新问题
 
-**Do not declare success until you've completed at least one fix-and-verify cycle.**
+**至少完成一次"修复并验证"循环后，才能宣告成功。**
 
----
+## 常见错误汇总
 
-## Common Mistakes to Avoid
+### 布局与定位
 
-### Layout & Positioning
+- **溢出** — 始终验证 `x+w ≤ 10` 和 `y+h ≤ 5.625`
+- **正文触及页码区域** — 正文内容必须在 `y:5.0` 前结束；页码标记位于 `y:5.1`
+- **背景不一致** — 在 `compile.js` 中统一定义，再传入各页；不要在每张幻灯片中硬编码
+- **文本框默认边距** — PptxGenJS 会添加内部内边距；需要精确对齐文本与形状时，设置 `margin: 0`
+- **对比度不足** — 图标和文本都需要与背景有足够的对比度
+- **大面积留白** — 使用图形布局组件（G1–G5）填充内容区域 `y:1.05–5.0`
 
-- **Overflow** — always verify `x+w ≤ 10` and `y+h ≤ 5.625`
-- **Body reaching badge area** — body content must end by `y:5.0`; badge lives at `y:5.1`
-- **Inconsistent backgrounds** — define once in `compile.js`, pass through; don't hardcode per slide
-- **Text box default margin** — PptxGenJS adds internal padding; set `margin: 0` when aligning text precisely with shapes
-- **Low contrast** — both icons and text need strong contrast against the background
-- **Large white space** — use graphic layout components (G1–G5) to fill the content area `y:1.05–5.0`
+### 内容与风格
 
-### Content & Style
+- **布局重复** — 跨幻灯片变换布局类型；使用 workflow.md 中的图形布局选择器
+- **正文居中** — 段落和列表应左对齐；只有标题和 KPI 数字才居中
+- **字号对比弱** — 标题需要 28pt 以上，才能与 12–14pt 正文形成视觉区分
+- **描述仅一个关键词** — 每项写 2–3 行完整句子，让客户无需主讲人也能理解
+- **纯文字幻灯片** — 添加形状、卡片或视觉结构；避免仅有标题加项目符号列表
 
-- **Repeating the same layout** — vary layout types across slides; use the graphic layout selector in workflow.md
-- **Centered body text** — left-align paragraphs and lists; center only titles and KPI numbers
-- **Weak size contrast** — titles need 28pt+ to visually separate from 12–14pt body text
-- **Single-keyword descriptions** — write complete sentences (2–3 lines per item) so clients understand without a presenter
-- **Text-only slides** — add shapes, cards, or visual structure; never plain title + bullet list
+### PptxGenJS 正确性
 
-### PptxGenJS Correctness
-
-- **`"#"` before hex colors** — causes file corruption; always `"FF0000"` not `"#FF0000"`
-- **Opacity in hex strings** — `"00000020"` corrupts; use `{ color: "000000", opacity: 0.12 }`
-- **`async` in `createSlide()`** — `compile.js` won't await; always synchronous
-- **Reusing option objects** — PptxGenJS mutates objects in-place; use factory functions for shared options like shadows
+- **十六进制颜色带 `"#"` 前缀** — 会导致文件损坏；始终使用 `"FF0000"` 而非 `"#FF0000"`
+- **在十六进制字符串中编码透明度** — `"00000020"` 会损坏文件；请使用 `{ color: "000000", opacity: 0.12 }`
+- **在 `createSlide()` 中使用 `async`** — `compile.js` 不会等待异步；始终使用同步写法
+- **复用选项对象** — PptxGenJS 会就地修改对象；对于阴影等共享选项，使用工厂函数生成

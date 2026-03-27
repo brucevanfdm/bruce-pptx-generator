@@ -1,28 +1,25 @@
 ---
 name: bruce-pptx-generator
-description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Handles two scenarios: (1) create a presentation from scratch with PptxGenJS using a complete design system (color palettes, style recipes, 5 slide types); (2) edit an existing PPTX file via XML manipulation. Always invoke this skill before generating any slide code or touching any .pptx file."
+description: "只要用户提到 PPT、PPTX、PowerPoint、演示文稿、幻灯片或 Deck，无论语气是否正式，都必须使用本技能。处理两种场景：(1) 使用 PptxGenJS 从零创建演示文稿，内置完整设计系统（色板、风格方案、5 种幻灯片类型）；(2) 通过 XML 操作编辑现有 PPTX 文件。在生成任何幻灯片代码或修改任何 .pptx 文件前，必须先调用本技能。"
 license: MIT
 metadata:
   version: "4.0"
-  category: productivity
-  sources:
-    - https://gitbrent.github.io/PptxGenJS/
 ---
-# Bruce's PPTX Generator
+# Bruce 的 PPTX 生成器
 
-## Task Routing
+## 任务路由
 
-Pick the right path based on the task, then load the listed files.
+根据任务类型选择正确的路径，然后加载对应文件。
 
-| Task                                            | Load these files                                                                                                                                            |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Edit** existing PPTX from template      | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md)                                                                                     |
-| **Create from scratch** with style preset | [workflow.md](references/workflow.md) + preset file + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md)                                            |
-| **Create from scratch** without preset    | [workflow.md](references/workflow.md) + [custom-style-guide.md](references/custom-style-guide.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
+| 任务                                        | 加载文件                                                                                                                                                    |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **编辑**现有模板 PPTX               | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md)                                                                                     |
+| **从零创建**（使用风格预设）       | [workflow.md](references/workflow.md) + 预设文件 + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md)                                            |
+| **从零创建**（不使用预设）         | [workflow.md](references/workflow.md) + [custom-style-guide.md](references/custom-style-guide.md) + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
 
-## Style Presets
+## 风格预设
 
-Using a preset? Load the preset file — it contains its own complete page layouts, component functions, color palette, and content density rules. The generic `custom-style-guide.md` is **not needed** when a preset is active.
+使用预设时，加载预设文件——其中包含完整的页面布局、组件函数、色板和内容密度规则。当预设激活时，**不需要**加载通用的 `custom-style-guide.md`。
 
 ### 风格选择流程
 
@@ -31,7 +28,7 @@ Using a preset? Load the preset file — it contains its own complete page layou
 Ask (header: "演讲氛围"):
 > 受众看完这份演示的感受是什么？
 
-| 选项 | description | 推荐 preset |
+| 选项 | 说明 | 推荐 preset |
 | ---- | ----------- | ----------- |
 | 逻辑严密 | 战略汇报、咨询报告、管理层提案 | **麦肯锡蓝**（默认） |
 | 权威可信 | 政企汇报、客户提案、正式场合 | 企业科技蓝 |
@@ -43,7 +40,7 @@ Ask (header: "演讲氛围"):
 
 ### Preset 列表
 
-| Preset | 氛围 | 字体组合 | 文件 | Best for |
+| Preset | 氛围 | 字体组合 | 文件 | 适用场景 |
 | ------ | ---- | -------- | ---- | -------- |
 | **麦肯锡蓝**（默认） | 权威、逻辑、顾问感 | Microsoft YaHei + Arial Black | [mckinsey-style.md](references/mckinsey-style.md) | 战略汇报、咨询报告、管理层提案、年度规划 |
 | 企业科技蓝 | 权威、专业、可信 | Microsoft YaHei + Arial | [default-style.md](references/default-style.md) | AI / 安全 / 产品汇报，政企客户，正式场合 |
@@ -51,50 +48,50 @@ Ask (header: "演讲氛围"):
 | 简约白 | 克制、专业、数据优先 | Microsoft YaHei + Arial | [minimal-white-style.md](references/minimal-white-style.md) | 内部报告、数据汇报、投资人 Deck |
 | 暖色商务 | 亲切、温暖、易接受 | Microsoft YaHei + Arial | [warm-biz-style.md](references/warm-biz-style.md) | 培训课程、HR 沟通、企业文化分享 |
 
-## Reference Files
+## 参考文件
 
-| File                                                   | Purpose                                                           |
+| 文件                                                   | 用途                                                              |
 | ------------------------------------------------------ | ----------------------------------------------------------------- |
-| [workflow.md](references/workflow.md)                     | Steps 1–7 creation workflow, outline review, compile script      |
-| [pptxgenjs.md](references/pptxgenjs.md)                   | Complete PptxGenJS API reference                                  |
-| [qa.md](references/qa.md)                                 | Pre-compile checklist, post-compile QA, common mistakes           |
+| [workflow.md](references/workflow.md)                     | 第 1–7 步创建工作流、大纲评审、编译脚本                         |
+| [pptxgenjs.md](references/pptxgenjs.md)                   | 完整的 PptxGenJS API 参考                                        |
+| [qa.md](references/qa.md)                                 | 编译前检查清单、编译后质量检查、常见错误                         |
 | [mckinsey-style.md](references/mckinsey-style.md)         | 麦肯锡蓝 preset：深蓝标题栏、Action Title、MECE 原则（默认风格） |
-| [custom-style-guide.md](references/custom-style-guide.md) | Color palettes, style recipes, 5 page types (no preset path only) |
-| [editing.md](references/editing.md)                       | Template-based XML editing workflow                               |
+| [custom-style-guide.md](references/custom-style-guide.md) | 色板、风格方案、5 种页面类型（仅限非预设路径使用）               |
+| [editing.md](references/editing.md)                       | 基于模板的 XML 编辑工作流                                        |
 
-## Mandatory Rules
+## 强制规则
 
-These apply to every slide in every presentation.
+以下规则适用于每份演示文稿的每一张幻灯片。
 
-**Dimensions** — 10" × 5.625" (LAYOUT_16x9). Every element must satisfy `x + w ≤ 10` and `y + h ≤ 5.625`.
+**尺寸** — 10" × 5.625"（LAYOUT_16x9）。每个元素必须满足 `x + w ≤ 10` 且 `y + h ≤ 5.625`。
 
-**Colors** — 6-char hex without `#` (e.g. `"FF0000"`). Never `"#FF0000"` — causes file corruption.
+**颜色** — 6 位十六进制，不含 `#`（例如 `"FF0000"`）。禁止使用 `"#FF0000"` — 会导致文件损坏。
 
-**Fonts** — Chinese: `Microsoft YaHei` | English: `Arial` (or the approved alternative specified in the active preset)
+**字体** — 中文：`Microsoft YaHei` | 英文：`Arial`（或当前预设中指定的替代字体）
 
-**Font anti-patterns** — Never use as display/title font: `宋体`, `仿宋`, `Times New Roman`. These read as amateur in modern presentations.
+**禁用字体** — 以下字体禁止用作展示/标题字体：`宋体`、`仿宋`、`Times New Roman`。在现代演示文稿中会显得业余。
 
-**Theme object** — exactly 5 keys, no others:
+**theme 对象** — 恰好 5 个键，不多不少：
 
-| Key                 | Purpose                                    |
+| 键                  | 用途                                       |
 | ------------------- | ------------------------------------------ |
-| `theme.primary`   | Darkest color — titles, primary text      |
-| `theme.secondary` | Accent — interactive elements, highlights |
-| `theme.accent`    | Signature accent color (e.g. orange line)  |
-| `theme.light`     | Light fill — card backgrounds, zebra rows |
-| `theme.bg`        | Slide background                           |
+| `theme.primary`   | 最深色 — 标题、主要文字                   |
+| `theme.secondary` | 强调色 — 交互元素、高亮                   |
+| `theme.accent`    | 标志性点缀色（例如橙色线条）               |
+| `theme.light`     | 浅色填充 — 卡片背景、斑马纹行             |
+| `theme.bg`        | 幻灯片背景色                               |
 
-Never use: `background`, `text`, `muted`, `darkest`, `lightest`, or any other key names.
+禁止使用：`background`、`text`、`muted`、`darkest`、`lightest` 或其他任何键名。
 
-**Page badge** — required on every slide except the Cover:
+**页码徽章** — 除封面外每张幻灯片都必须有：
 
-- Circle: `x: 9.3, y: 5.1, w: 0.4, h: 0.4`
-- Pill: `x: 9.1, y: 5.15, w: 0.6, h: 0.35`
-- Show page number only (e.g. `"3"`), never `"3/12"`
+- 圆形：`x: 9.3, y: 5.1, w: 0.4, h: 0.4`
+- 胶囊形：`x: 9.1, y: 5.15, w: 0.6, h: 0.35`
+- 只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式
 
-**`createSlide()` must be synchronous** — never `async`. compile.js won't await it.
+**`createSlide()` 必须是同步函数** — 禁止使用 `async`。compile.js 不会 await 它。
 
-## DO NOT (常见 AI 生成质量陷阱)
+## 禁止事项（常见 AI 生成质量陷阱）
 
 这些是最容易让演示文稿显得低质量的模式，每次生成都要主动避免：
 
@@ -114,7 +111,7 @@ Never use: `background`, `text`, `muted`, `darkest`, `lightest`, or any other ke
 - 英文 text 混用宋体/仿宋 — 英文必须用指定英文字体
 - `#` 前缀颜色值（`"#1A3C6E"` → 改为 `"1A3C6E"`）— 会导致文件损坏
 
-## Dependencies
+## 依赖安装
 
 ```shell
 npm install -g pptxgenjs

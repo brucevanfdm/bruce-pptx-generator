@@ -1,98 +1,94 @@
-# Custom Style Guide
+# 自定义风格指南
 
-> **Use this file only when NOT using a style preset.** If `default-style.md` (企业科技蓝) is active, this file is not needed — the preset already defines its own color palette, fonts, spacing, and page layouts.
+> **仅在不使用风格预设时参考此文件。** 若已启用 `default-style.md`（企业科技蓝），则无需此文件——预设已包含自己的调色板、字体、间距与页面布局。
 
-This file covers two things needed together for any custom style:
-1. **Design System** — color palette selection, fonts, style recipes, typography & spacing
-2. **Slide Page Types** — 5 page type layouts, font hierarchies, content elements
+本文件涵盖任何自定义风格所需的两项内容：
+1. **设计系统** — 调色板选择、字体、风格方案、排版与间距
+2. **幻灯片页面类型** — 5 种页面布局、字体层级、内容元素
 
----
+## 第一部分 — 设计系统
 
-## Part 1 — Design System
+### 调色板参考
 
-### Color Palette Reference
+| # | 名称 | 颜色 | 风格 | 适用场景 |
+|---|------|------|------|----------|
+| 1 | Modern & Wellness | `#006d77` `#83c5be` `#edf6f9` `#ffddd2` `#e29578` | 清新、舒缓 | 医疗健康、心理咨询、护肤、瑜伽/水疗 |
+| 2 | Business & Authority | `#2b2d42` `#8d99ae` `#edf2f4` `#ef233c` `#d90429` | 正式、经典 | 年报、金融、企业、政府机构 |
+| 3 | Nature & Outdoors | `#606c38` `#283618` `#fefae0` `#dda15e` `#bc6c25` | 沉稳、自然 | 户外装备、环保、农业 |
+| 4 | Vintage & Academic | `#780000` `#c1121f` `#fdf0d5` `#003049` `#669bbc` | 经典、学术 | 学术研究、历史、博物馆、传统品牌 |
+| 5 | Soft & Creative | `#cdb4db` `#ffc8dd` `#ffafcc` `#bde0fe` `#a2d2ff` | 梦幻、糖果色调 | 母婴、甜品、女性时尚 |
+| 6 | Bohemian | `#ccd5ae` `#e9edc9` `#fefae0` `#faedcd` `#d4a373` | 柔和、低饱和 | 婚礼、家居装饰、有机食品 |
+| 7 | Vibrant & Tech | `#8ecae6` `#219ebc` `#023047` `#ffb703` `#fb8500` | 高能量 | 体育、创业路演、青少年教育 |
+| 8 | Craft & Artisan | `#7f5539` `#a68a64` `#ede0d4` `#656d4a` `#414833` | 质朴 | 咖啡馆、手工艺、烘焙坊 |
+| 9 | Tech & Night | `#000814` `#001d3d` `#003566` `#ffc300` `#ffd60a` | 深邃、光感强 | 科技发布会、豪华汽车（深色模式） |
+| 10 | Education & Charts | `#264653` `#2a9d8f` `#e9c46a` `#f4a261` `#e76f51` | 清晰、逻辑性强 | 统计报告、教育、市场分析 |
+| 11 | Forest & Eco | `#dad7cd` `#a3b18a` `#588157` `#3a5a40` `#344e41` | 单色调、森林感 | 风景、ESG 报告、环境主题 |
+| 12 | Elegant & Fashion | `#edafb8` `#f7e1d7` `#dedbd2` `#b0c4b1` `#4a5759` | 低调、莫兰迪色 | 高定时装、艺术画廊、美妆品牌 |
+| 13 | Art & Food | `#335c67` `#fff3b0` `#e09f3e` `#9e2a2b` `#540b0e` | 浓郁、复古海报感 | 美食纪录片、艺术展览 |
+| 14 | Luxury & Mysterious | `#22223b` `#4a4e69` `#9a8c98` `#c9ada7` `#f2e9e4` | 冷峻、紫调 | 珠宝、酒店、高端咨询 |
+| 15 | Pure Tech Blue | `#03045e` `#0077b6` `#00b4d8` `#90e0ef` `#caf0f8` | 未来感、简洁 | 云计算/AI、医院、清洁能源 |
+| 16 | Coastal Coral | `#0081a7` `#00afb9` `#fdfcdc` `#fed9b7` `#f07167` | 清爽、夏日感 | 旅行、饮料品牌、海洋主题 |
+| 17 | Vibrant Orange Mint | `#ff9f1c` `#ffbf69` `#ffffff` `#cbf3f0` `#2ec4b6` | 明亮、活泼 | 儿童活动、促销推广、快消品 |
+| 18 | Platinum White Gold | `#0a0a0a` `#0070F3` `#D4AF37` `#f5f5f5` `#ffffff` | 高端、专业 | 智能体产品、金融科技、奢侈品牌 |
 
-| # | Name | Colors | Style | Use Cases |
-|---|------|--------|-------|-----------|
-| 1 | Modern & Wellness | `#006d77` `#83c5be` `#edf6f9` `#ffddd2` `#e29578` | Fresh, soothing | Healthcare, counseling, skincare, yoga/spa |
-| 2 | Business & Authority | `#2b2d42` `#8d99ae` `#edf2f4` `#ef233c` `#d90429` | Formal, classic | Annual reports, financial, corporate, government |
-| 3 | Nature & Outdoors | `#606c38` `#283618` `#fefae0` `#dda15e` `#bc6c25` | Grounded, earthy | Outdoor gear, environmental, agriculture |
-| 4 | Vintage & Academic | `#780000` `#c1121f` `#fdf0d5` `#003049` `#669bbc` | Classic, scholarly | Academic, history, museums, heritage brands |
-| 5 | Soft & Creative | `#cdb4db` `#ffc8dd` `#ffafcc` `#bde0fe` `#a2d2ff` | Dreamy, candy-toned | Mother & baby, desserts, women's fashion |
-| 6 | Bohemian | `#ccd5ae` `#e9edc9` `#fefae0` `#faedcd` `#d4a373` | Gentle, muted | Wedding, home decor, organic food |
-| 7 | Vibrant & Tech | `#8ecae6` `#219ebc` `#023047` `#ffb703` `#fb8500` | High energy | Sports, startup pitches, youth education |
-| 8 | Craft & Artisan | `#7f5539` `#a68a64` `#ede0d4` `#656d4a` `#414833` | Rustic | Coffee shops, handicrafts, bakery |
-| 9 | Tech & Night | `#000814` `#001d3d` `#003566` `#ffc300` `#ffd60a` | Deep, luminous | Tech launches, luxury automobiles (dark mode) |
-| 10 | Education & Charts | `#264653` `#2a9d8f` `#e9c46a` `#f4a261` `#e76f51` | Clear, logical | Statistical reports, education, market analysis |
-| 11 | Forest & Eco | `#dad7cd` `#a3b18a` `#588157` `#3a5a40` `#344e41` | Monochrome, forest | Landscape, ESG reports, environmental |
-| 12 | Elegant & Fashion | `#edafb8` `#f7e1d7` `#dedbd2` `#b0c4b1` `#4a5759` | Muted, Morandi | Haute couture, art galleries, beauty brands |
-| 13 | Art & Food | `#335c67` `#fff3b0` `#e09f3e` `#9e2a2b` `#540b0e` | Rich, vintage-poster | Food documentaries, art exhibitions |
-| 14 | Luxury & Mysterious | `#22223b` `#4a4e69` `#9a8c98` `#c9ada7` `#f2e9e4` | Cool, purple-toned | Jewelry, hotel, high-end consulting |
-| 15 | Pure Tech Blue | `#03045e` `#0077b6` `#00b4d8` `#90e0ef` `#caf0f8` | Futuristic, clean | Cloud/AI, hospitals, clean energy |
-| 16 | Coastal Coral | `#0081a7` `#00afb9` `#fdfcdc` `#fed9b7` `#f07167` | Refreshing, summery | Travel, beverage brands, ocean themes |
-| 17 | Vibrant Orange Mint | `#ff9f1c` `#ffbf69` `#ffffff` `#cbf3f0` `#2ec4b6` | Bright, cheerful | Children's events, promotional, FMCG |
-| 18 | Platinum White Gold | `#0a0a0a` `#0070F3` `#D4AF37` `#f5f5f5` `#ffffff` | Premium, professional | Agent products, fintech, luxury brands |
+**快速选择指南：**
 
-**Quick selection guide:**
+| 演示类型 | 推荐调色板 |
+|----------|------------|
+| 金融 / 数据报告 | 2 Business & Authority |
+| 企业 / 商务 | 14 Luxury & Mysterious 或 18 Platinum White Gold |
+| 产品介绍 / 营销 | 7 Vibrant & Tech 或 17 Orange Mint |
+| ESG / 环保 | 11 Forest & Eco |
+| 医疗健康 | 1 Modern & Wellness |
+| 科技 / AI | 15 Pure Tech Blue 或 9 Tech & Night |
 
-| Presentation Type | Recommended Palette |
-|------------------|---------------------|
-| Finance / Data reports | 2 Business & Authority |
-| Corporate / Business | 14 Luxury & Mysterious or 18 Platinum White Gold |
-| Product intro / Marketing | 7 Vibrant & Tech or 17 Orange Mint |
-| ESG / Environmental | 11 Forest & Eco |
-| Healthcare | 1 Modern & Wellness |
-| Tech / AI | 15 Pure Tech Blue or 9 Tech & Night |
+### 颜色规则
 
-### Color Rules
+- **仅使用**所选调色板中的颜色——不得自行创建或修改颜色
+- 不使用渐变——仅使用纯色
+- 不使用动画或过渡效果——所有幻灯片均为静态
+- 透明度仅通过 `transparency` 属性设置（范围 0–100）
 
-- Use **only** the chosen palette — do not create or modify colors
-- No gradients — solid colors only
-- No animations or transitions — all slides are static
-- Transparency via the `transparency` property (0–100) only
+### 字体参考
 
-### Font Reference
+| 语言 | 默认字体 | 备选字体 |
+|------|----------|----------|
+| 中文 | `Microsoft YaHei` | — |
+| 英文 | `Arial` | Georgia、Calibri、Cambria、Trebuchet MS |
 
-| Language | Default | Alternatives |
-|----------|---------|--------------|
-| Chinese | `Microsoft YaHei` | — |
-| English | `Arial` | Georgia, Calibri, Cambria, Trebuchet MS |
+**推荐搭配：**
 
-**Recommended pairings:**
-
-| Header | Body |
-|--------|------|
+| 标题字体 | 正文字体 |
+|----------|----------|
 | Georgia | Calibri |
 | Arial Black | Arial |
 | Cambria | Calibri |
 | Trebuchet MS | Calibri |
 
-- Body text: **never bold** — reserve bold for titles and headings only
-- Mixed Chinese-English: Microsoft YaHei for Chinese segments, chosen English font for Latin
+- 正文文字：**不加粗**——加粗仅用于标题和章节标题
+- 中英混排：中文部分使用 Microsoft YaHei，拉丁文部分使用所选英文字体
 
----
+### 风格方案
 
-### Style Recipes
+为整个演示文稿选择一种方案，不同幻灯片混用多种方案会显得不统一。
 
-Choose one recipe for the entire presentation. Mixing recipes across slides looks inconsistent.
+| 方案 | 圆角半径 | 间距 | 适合场景 |
+|------|----------|------|----------|
+| **锐利紧凑** | 0–0.05" | 紧凑 | 数据密集型、专业报告 |
+| **柔和均衡** | 0.08–0.12" | 适中 | 企业商务、通用场景 |
+| **圆润宽松** | 0.15–0.25" | 舒适 | 产品介绍、营销推广 |
+| **胶囊通透** | 0.3–0.5" | 开阔 | 品牌展示、发布活动 |
 
-| Recipe | Corner Radius | Spacing | Best for |
-|--------|--------------|---------|---------|
-| **Sharp & Compact** | 0–0.05" | Tight | Data-dense, professional reports |
-| **Soft & Balanced** | 0.08–0.12" | Moderate | Corporate, general business |
-| **Rounded & Spacious** | 0.15–0.25" | Relaxed | Product intros, marketing |
-| **Pill & Airy** | 0.3–0.5" | Open | Brand showcases, launch events |
+**组件对照：**
 
-**Component mapping:**
+| 组件 | 锐利 | 柔和 | 圆润 | 胶囊 |
+|------|------|------|------|------|
+| 按钮 / 标签 | 0 | 0.05 | 0.1 | 0.2 |
+| 卡片 / 容器 | 0.03 | 0.1 | 0.2 | 0.3 |
+| 图片容器 | 0 | 0.08 | 0.15 | 0.25 |
+| 徽章 | 0.02 | 0.05 | 0.08 | 0.15 |
 
-| Component | Sharp | Soft | Rounded | Pill |
-|-----------|-------|------|---------|------|
-| Button / Tag | 0 | 0.05 | 0.1 | 0.2 |
-| Card / Container | 0.03 | 0.1 | 0.2 | 0.3 |
-| Image Container | 0 | 0.08 | 0.15 | 0.25 |
-| Badge | 0.02 | 0.05 | 0.08 | 0.15 |
-
-**Rule**: outer container radius ≥ inner element radius. Never the reverse.
+**规则**：外层容器圆角半径 ≥ 内层元素圆角半径，不可反转。
 
 ```javascript
 // Sharp style card
@@ -104,160 +100,150 @@ slide.addShape("rect", { x:3, y:4, w:2, h:0.4,
   fill: { color: "4A90D9" }, rectRadius: 0.2 });
 ```
 
-### Typography Scale
+### 排版字号规范
 
-| Usage | Size (pt) |
-|-------|-----------|
-| Annotations / Sources | 10–12 |
-| Body / Description | 14–16 |
-| Subtitle | 18–22 |
-| Title | 28–36 |
-| Large Title | 44–60 |
-| Data Callout | 60–96 |
+| 用途 | 字号（pt） |
+|------|------------|
+| 注释 / 来源 | 10–12 |
+| 正文 / 描述 | 14–16 |
+| 副标题 | 18–22 |
+| 标题 | 28–36 |
+| 大标题 | 44–60 |
+| 数据大字 | 60–96 |
 
-### Spacing Scale (10" × 5.625" slide)
+### 间距规范（幻灯片尺寸 10" × 5.625"）
 
-| Usage | Inches |
-|-------|--------|
-| Icon-to-text gap | 0.08–0.15 |
-| List item spacing | 0.15–0.25 |
-| Card inner padding | 0.2–0.4 |
-| Element group gap | 0.3–0.5 |
-| Page safe margin | 0.4–0.6 |
-| Major block gap | 0.5–0.8 |
+| 用途 | 英寸 |
+|------|------|
+| 图标与文字间距 | 0.08–0.15 |
+| 列表项间距 | 0.15–0.25 |
+| 卡片内边距 | 0.2–0.4 |
+| 元素组间距 | 0.3–0.5 |
+| 页面安全边距 | 0.4–0.6 |
+| 主要内容块间距 | 0.5–0.8 |
 
----
+## 第二部分 — 幻灯片页面类型
 
-## Part 2 — Slide Page Types
+每张幻灯片必须归属以下 5 种类型之一。
 
-Classify **every slide** as exactly one of these 5 types.
+### 1. 封面页
 
-### 1. Cover Page
+**用途**：开场定调。内容：大标题、副标题、日期/演讲者、强视觉元素。
 
-**Use for**: Opening + tone setting. Content: big title, subtitle, date/presenter, strong visual.
-
-**Layout options:**
+**布局选项：**
 
 ```
-Asymmetric Left-Right:        Center-Aligned:
-|  Title & Subtitle  | Image |  |         [BG Image]        |
-|  Description       |       |  |         MAIN TITLE        |
-                                |         Subtitle           |
+左右不对称：                    居中对齐：
+|  标题与副标题  | 图片 |        |         [背景图片]        |
+|  描述文字      |      |        |         主标题            |
+                                |         副标题             |
 ```
 
-**Font hierarchy:**
+**字体层级：**
 
-| Element | Size | Notes |
-|---------|------|-------|
-| Main Title | 72–120pt | Largest, focal point |
-| Subtitle | 28–40pt | Clearly smaller than title |
-| Supporting Text | 18–24pt | Base size |
-| Meta (date, name) | 14–18pt | Smallest |
+| 元素 | 字号 | 说明 |
+|------|------|------|
+| 主标题 | 72–120pt | 最大，视觉焦点 |
+| 副标题 | 28–40pt | 明显小于主标题 |
+| 辅助文字 | 18–24pt | 基础字号 |
+| 元信息（日期、姓名） | 14–18pt | 最小 |
 
-Title must be 2–3× larger than subtitle. Never let adjacent text elements be within 20% of each other's size.
+主标题须为副标题的 2–3 倍大小。相邻文字元素的字号差距不得小于 20%。
 
-**Content elements:** Main Title (required) · Subtitle · Icons · Date/Event · Company logo · Presenter name
+**内容元素：** 主标题（必填）· 副标题 · 图标 · 日期/活动 · 公司 Logo · 演讲者姓名
 
----
+### 2. 目录页
 
-### 2. Table of Contents
+**用途**：导航与预期引导（3–5 个章节）。
 
-**Use for**: Navigation + expectation setting (3–5 sections).
-
-**Layout options:**
+**布局选项：**
 
 ```
-Numbered Vertical List:       Two-Column Grid:
-|  CONTENTS            |      |  01 Section  02 Section  |
-|  01  Section One     |      |     Desc        Desc     |
-|  02  Section Two     |      |  03 Section  04 Section  |
+编号纵向列表：                  双列网格：
+|  目录            |            |  01 章节  02 章节  |
+|  01  第一章节    |            |     描述     描述  |
+|  02  第二章节    |            |  03 章节  04 章节  |
 
-Sidebar Navigation:           Card-Based:
-| ▌01 | Section One   |      | ┌──┐ ┌──┐ ┌──┐ ┌──┐    |
-| ▌02 | Section Two   |      | │01│ │02│ │03│ │04│    |
-| ▌03 | Section Three |      | └──┘ └──┘ └──┘ └──┘    |
+侧边导航：                      卡片式：
+| ▌01 | 第一章节   |            | ┌──┐ ┌──┐ ┌──┐ ┌──┐    |
+| ▌02 | 第二章节   |            | │01│ │02│ │03│ │04│    |
+| ▌03 | 第三章节   |            | └──┘ └──┘ └──┘ └──┘    |
 ```
 
-**Font hierarchy:** TOC title 36–44pt · Section number 28–36pt · Section title 20–28pt · Description 14–16pt
+**字体层级：** 目录标题 36–44pt · 章节编号 28–36pt · 章节标题 20–28pt · 描述文字 14–16pt
 
-**Decision guide:** 3 sections → vertical list; 4–6 → grid or compact; 7+ → multi-column. **Page badge: MANDATORY.**
+**选择建议：** 3 个章节 → 纵向列表；4–6 个 → 网格或紧凑布局；7 个以上 → 多列。**页码标记：必须添加。**
 
----
+### 3. 章节过渡页
 
-### 3. Section Divider
+**用途**：清晰分隔主要部分。内容：章节编号 + 标题 + 可选 1–2 行简介。
 
-**Use for**: Clear transitions between major parts. Content: section number + title + optional 1–2 line intro.
-
-**Layout options:**
+**布局选项：**
 
 ```
-Bold Center:            Left-Aligned Accent:     Split Background:
-|       02         |   | ████ | 02             | | ██████ | TITLE   |
-|  SECTION TITLE   |   | ████ | SECTION TITLE  | | ██ 02  |         |
-|  Optional intro  |   | ████ | Optional intro | | ██████ |         |
+大字居中：                左对齐强调：                分割背景：
+|       02         |      | ████ | 02             |   | ██████ | 标题   |
+|  章节标题        |      | ████ | 章节标题       |   | ██ 02  |        |
+|  可选简介        |      | ████ | 可选简介       |   | ██████ |        |
 ```
 
-**Font hierarchy:** Section number 72–120pt · Section title 36–48pt · Intro text 16–20pt
+**字体层级：** 章节编号 72–120pt · 章节标题 36–48pt · 简介文字 16–20pt
 
-**Rules:** Same divider layout across all dividers in one deck. Visually distinct from content slides (different background, more whitespace). **Page badge: MANDATORY.**
+**规则：** 同一演示文稿中所有过渡页使用相同布局。在视觉上明显区别于内容页（使用不同背景、更多留白）。**页码标记：必须添加。**
 
----
+### 4. 内容页
 
-### 4. Content Page
+每张幻灯片选择一种子类型，该子类型决定整体布局。
 
-Pick one subtype per slide — drives the entire layout.
+**子类型：**
 
-**Subtypes:**
+| 子类型 | 布局示意 | 说明 |
+|--------|----------|------|
+| 文字型 | 标题 + 要点/段落 | 必须添加图标或形状——不可纯文字 |
+| 图文混合 | 双列：左文右图 | |
+| 数据可视化 | 图表 + 关键结论 + 来源 | 必须注明数据来源 |
+| 对比型 | 并列栏或卡片 | A vs B、优缺点对比 |
+| 时间轴 / 流程 | 编号步骤加箭头 | |
+| 图片展示 | 主视觉图或图库，附说明 | |
 
-| Subtype | Layout sketch | Notes |
-|---------|--------------|-------|
-| Text | Title + bullets/paragraphs | Always add icons or shapes — never plain text only |
-| Mixed Media | Two-column: text left, image right | |
-| Data Visualization | Chart + takeaways + source | Must include data source |
-| Comparison | Side-by-side columns or cards | A vs B, pros/cons |
-| Timeline / Process | Numbered steps with arrows | |
-| Image Showcase | Hero image or gallery, caption | |
+**字体层级：** 标题 36–44pt · 段落标题 20–24pt · 正文 14–16pt · 说明/来源 10–12pt · 数据大字 60–72pt
 
-**Font hierarchy:** Title 36–44pt · Section header 20–24pt · Body 14–16pt · Caption/source 10–12pt · Stat callout 60–72pt
+**规则：**
+- 正文与要点全部左对齐——段落不居中
+- 标题须 36pt 以上，以区别于 14–16pt 的正文
+- 每张内容页至少包含一个非文字视觉元素
+- 最小边距 0.5"，内容块间距 0.3–0.5"
+- 相邻幻灯片使用不同布局
+- **页码标记：必须添加**
 
-**Rules:**
-- Left-align all body text and bullets — never center paragraphs
-- Title must be 36pt+ to contrast with 14–16pt body
-- Every content slide needs at least one non-text visual element
-- 0.5" minimum margins, 0.3–0.5" between content blocks
-- Each slide should use a different layout from its neighbors
-- **Page badge: MANDATORY**
+**增加变化的额外布局方式：**
+- 双列（左文右图）
+- 图标 + 文字行（图标置于彩色圆形内，粗体标题，下方附描述）
+- 2×2 或 2×3 网格卡片
+- 半出血图片配内容叠加
+- 大数据字（60–72pt 数字配小标签）
+- 对比栏（前后对比、优缺点）
+- 时间轴或流程图（编号步骤、箭头）
 
-**Additional layout patterns for variety:**
-- Two-column (text left, illustration right)
-- Icon + text rows (icon in colored circle, bold header, description below)
-- 2×2 or 2×3 grid cards
-- Half-bleed image with content overlay
-- Large stat callouts (60–72pt numbers with small labels)
-- Comparison columns (before/after, pros/cons)
-- Timeline or process flow (numbered steps, arrows)
+### 5. 总结 / 结尾页
 
----
+**用途**：收尾与行动召唤。内容：关键要点、行动号召/后续步骤、联系方式、致谢。
 
-### 5. Summary / Closing Page
-
-**Use for**: Wrap-up + action. Content: key takeaways, CTA/next steps, contact info, thank-you.
-
-**Layout options:**
+**布局选项：**
 
 ```
-Key Takeaways:             CTA / Next Steps:
-|  KEY TAKEAWAYS     |    |  NEXT STEPS           |
-|  ✓  Point one      |    |  [1] Action item one  |
-|  ✓  Point two      |    |  [2] Action item two  |
-|  ✓  Point three    |    |  Contact: email       |
+关键要点：                      行动号召 / 后续步骤：
+|  关键要点           |         |  后续步骤              |
+|  ✓  要点一          |         |  [1] 行动项一          |
+|  ✓  要点二          |         |  [2] 行动项二          |
+|  ✓  要点三          |         |  联系方式：邮箱        |
 
-Thank You / Contact:       Split Recap:
-|      THANK YOU     |    |  SUMMARY  |  NEXT STEPS  |
-|  email@company.com |    |  * Point  |  Contact us  |
-|  @handle           |    |  * Point  |  [QR Code]   |
+致谢 / 联系方式：               分栏总结：
+|      感谢聆听       |         |  总结     |  后续步骤  |
+|  email@company.com  |         |  * 要点   |  联系我们  |
+|  @handle            |         |  * 要点   |  [二维码]  |
 ```
 
-**Font hierarchy:** Closing title 48–72pt · Takeaway / action item 18–24pt · Supporting text 14–16pt · Contact info 14–16pt
+**字体层级：** 结尾标题 48–72pt · 要点 / 行动项 18–24pt · 辅助文字 14–16pt · 联系信息 14–16pt
 
-**Decision guide:** Many takeaways → list; Simple closing → centered thank-you; Action needed → CTA. Match energy of cover page. **Page badge: MANDATORY.**
+**选择建议：** 要点较多 → 列表式；简单收尾 → 居中致谢；需要行动 → 行动号召式。风格与封面页保持呼应。**页码标记：必须添加。**
