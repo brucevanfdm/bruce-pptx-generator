@@ -113,6 +113,34 @@
 
 进入第 5 步前修复所有不符合项。
 
+## 第 4.8 步：初始化工具文件（需要图标时）
+
+如果演示文稿中有任何 `addIconKpiCard` 调用，在开始写 slide 文件之前，先在 `slides/` 目录创建以下工具文件。只需创建一次。
+
+```javascript
+// slides/icon-utils.js
+const React = require("react");
+const { renderToStaticMarkup } = require("react-dom/server");
+const sharp = require("sharp");
+
+async function iconToBase64Png(IconComponent, color, size = 256) {
+  const svg = renderToStaticMarkup(
+    React.createElement(IconComponent, { color, size })
+  );
+  const pngBuf = await sharp(Buffer.from(svg)).resize(size, size).png().toBuffer();
+  return "image/png;base64," + pngBuf.toString("base64");
+}
+
+module.exports = { iconToBase64Png };
+```
+
+安装依赖（全局，只需执行一次）：
+```shell
+npm install -g react-icons react react-dom sharp
+```
+
+使用图标时，**compile.js 整个文件必须包裹在 `(async () => { ... })()` 中**，因为 CommonJS 不支持顶层 `await`。完整写法见 mckinsey-style.md § 8 的 compile.js 示例。
+
 ## 第 5 步：生成幻灯片 JS 文件
 
 在 `slides/` 中为每张幻灯片创建一个 JS 文件，每个文件导出一个同步的 `createSlide(pres, theme)` 函数。
