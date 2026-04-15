@@ -72,14 +72,16 @@ const theme = {
 - 表格：斑马行增强可读性
 - 数据注释：左下角或底部，灰色小字
 
-**内容密度指引（顾问汇报型）：**
+**内容密度指引（顾问汇报型 — 精装标准）：**
 
-> 本风格定位为**顾问汇报型**：每张幻灯片一个核心论点，3–5 条 MECE 支撑。
+> 本风格定位为**顾问汇报型**：每张幻灯片一个核心论点，配套 MECE 支撑论据，每个论点必须有数据/统计支撑。
 
-- 每张内容页：核心要点 3–5 条（不超过）
-- 每条要点：主标题 ≤ 25 字 + 可选支撑说明 1–2 行
+- 每张内容页：核心要点 **4–6 条**（超出 6 条拆页，少于 4 条需增加 tagline/洞察补满）
+- 每条要点：主标题 ≤ 25 字 + **tagline 1 句**（12–20 字）+ 支撑说明 2–3 行
+- 每张内容页至少包含 **1 个非纯文字视觉组件**（图表 / KPI 卡 / 对比矩阵 / 进度环 / SVG 流程图）
 - 数据表格：最多 6 行 × 5 列（超出则拆页）
 - 标题：必须是结论句 / 建议句，不允许纯描述性话题
+- 底部说明区：每个模块底部应有 1–2 行洞察或行动建议
 
 ## 标志性设计元素
 
@@ -208,6 +210,56 @@ function addMcKinseyCard(slide, pres, theme, x, y, w, h, value, label, descripti
       fontSize: 10, fontFace: "Microsoft YaHei",
       color: theme.mutedText, align: "center", margin: 0
     });
+  }
+}
+```
+
+
+
+### 4.5 精装能力卡片（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addMcKinseyCard`**。精装卡片包含：顶部蓝色强调线、KPI 大数值、标签、tagline、带前缀的 bullet 功能列表、底部洞察说明区。
+
+```javascript
+function addMcKinseyRichCard(slide, pres, theme, x, y, w, h, value, unit, label, tagline, features, detail, highlight) {
+  const accentColor = highlight ? theme.accent : theme.secondary;
+  const bgColor = highlight ? "D6E4F7" : theme.light; // 高亮用深蓝浅底（麦肯锡无橙色）
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: bgColor }, line: { color: theme.border, width: 0.5 } });
+  // 顶部强调线
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.06, fill: { color: accentColor } });
+
+  // KPI 大数值
+  slide.addText(value, { x: x + 0.1, y: y + 0.15, w: w - 0.2, h: 0.75, fontSize: 40, fontFace: "Arial Black", color: accentColor, bold: true, align: "center", valign: "middle", margin: 0 });
+  if (unit) {
+    slide.addText(unit, { x: x + w * 0.55, y: y + 0.18, w: w * 0.42, h: 0.28, fontSize: 12, fontFace: "Microsoft YaHei", color: accentColor, bold: true, align: "left", valign: "top", margin: 0 });
+  }
+
+  // 标签
+  slide.addText(label, { x: x + 0.1, y: y + 0.95, w: w - 0.2, h: 0.32, fontSize: 12, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", margin: 0 });
+
+  // Tagline
+  slide.addText(tagline, { x: x + 0.1, y: y + 1.28, w: w - 0.2, h: 0.28, fontSize: 9.5, fontFace: "Microsoft YaHei", color: accentColor, align: "center", margin: 0 });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.1, y: y + 1.62, w: w - 0.2, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // Bullet 功能列表（带小方块前缀）
+  const featStartY = y + 1.7;
+  const featH = 0.38;
+  features.forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.12, y: fy + 0.12, w: 0.1, h: 0.1, fill: { color: accentColor } });
+    slide.addText(f, { x: x + 0.28, y: fy + 0.05, w: w - 0.42, h: featH - 0.1, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "middle", margin: 0 });
+  });
+
+  // 底部洞察说明区
+  if (detail) {
+    const footerY = y + h - 0.55;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: w - 0.2, h: 0.45, fill: { color: "FFFFFF" }, line: { color: theme.border, width: 0.3 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: 0.05, h: 0.45, fill: { color: theme.mutedText } });
+    slide.addText(detail, { x: x + 0.2, y: footerY, w: w - 0.38, h: 0.45, fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "middle", margin: 0 });
   }
 }
 ```
@@ -1144,16 +1196,17 @@ addMcKinseyRadarChart(slide, pres, theme, 0.4, 1.1, 5.5, 4.0,
 
 ## 视觉选择决策树
 
-根据内容类型选择合适的视觉组件，避免全文字布局：
+根据内容类型选择合适的视觉组件。**优先使用精装组件，基础组件仅在降级方案或空间极度受限时使用。**
 
-| 内容类型 | 推荐组件 |
+| 内容类型 | 推荐组件（精装优先） |
 |---------|---------|
+| **顾问建议 / 解决方案要点** | **`addMcKinseyRichCard`**（tagline + bullet + 底部洞察） |
+| **KPI 数字 + 语义图标** | **`addIconKpiCard`**（react-icons） |
 | 时间序列趋势 | `addMcKinseyChart(LINE)` |
 | 类别对比（5 项以内） | `addMcKinseyChart(BAR)` |
 | 多维对比 + 洞察 | `createChartWithInsightsSlide` |
 | 构成比例 | `addMcKinseyChart(PIE/DOUGHNUT)` |
 | 多维对比条（无原生图表） | `makeHBarChart` (SVG) |
-| KPI 数字 + 语义图标 | `addIconKpiCard`（react-icons） |
 | 完成率 / 目标达成 | `makeProgressRing` (SVG) |
 | KPI 卡内走势 | `makeSparkline` (SVG) |
 | 流程 / 路径步骤 | `makeProcessNode` (SVG) + LINE |
@@ -1166,9 +1219,11 @@ addMcKinseyRadarChart(slide, pres, theme, 0.4, 1.1, 5.5, 4.0,
 | 战略分析框架 (SWOT) | `createSWOTSlide` |
 | 多方案 / 竞品对比 | `addComparisonGrid` |
 | 多维能力评分 / 竞争力 | `addMcKinseyRadarChart` |
-| 并列要点文字 | `addBulletSection` |
+| 并列要点文字（降级） | `addBulletSection` |
 
-**每张 Content 页至少包含一种非纯文字的视觉组件（图表、图标卡、SVG 图形），除非内容本身是纯文字分析结论。**
+**强制规则：**
+- **每张 Content 页至少包含 1 种非纯文字视觉组件**（图表 / KPI 卡 / 对比矩阵 / 进度环 / SVG 流程图）
+- 基础 `addMcKinseyCard(value, label, description)` 视为毛坯房组件，仅在空间极度受限时使用；建议升级为 `addMcKinseyRichCard`
 
 ## 5 种页面类型
 
@@ -1210,6 +1265,83 @@ slide.addText("核心洞察摘要", {
   fontSize: 18, fontFace: "Microsoft YaHei",
   color: theme.primary, bold: true, align: "left", margin: 0
 });
+```
+
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 替代基础代码片段。** 右侧增加 3 个关键结论摘要卡，封面即传递核心论点。
+
+```javascript
+/**
+ * @param {string} title      - 报告主标题（结论句）
+ * @param {string} subtitle   - 副标题（部门 / 报告周期）
+ * @param {string} dateStr    - 日期
+ * @param {Array}  insights   - 右侧 3 条核心结论，每项 { num, headline, detail }
+ *                              例：[{ num:"01", headline:"数字化可降低运营成本35%", detail:"基于12个客户样本" }, ...]
+ * @param {string} tag        - 顶部小标签（如"战略咨询报告"），可选
+ */
+function createRichCover(pres, theme, title, subtitle, dateStr, insights, tag) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 左侧深蓝色带
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 4.0, h: 5.625, fill: { color: theme.primary } });
+  // 天蓝边界细线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 4.0, y: 0, w: 0.05, h: 5.625, fill: { color: theme.accent } });
+  // 底部次色填充
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 4.6, w: 4.0, h: 1.025, fill: { color: theme.secondary } });
+  // 顶部标签横线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.35, y: 1.1, w: 0.9, h: 0.05, fill: { color: theme.accent } });
+
+  if (tag) {
+    slide.addText(tag, { x: 0.35, y: 1.22, w: 3.3, h: 0.28, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.light, align: "left", margin: 0 });
+  }
+  // 主标题
+  slide.addText(title, { x: 0.35, y: 1.58, w: 3.3, h: 2.1, fontSize: 26, fontFace: "Microsoft YaHei", color: "FFFFFF", bold: true, align: "left", valign: "top", margin: 0, lineSpaceMult: 1.3 });
+  // 副标题
+  if (subtitle) {
+    slide.addText(subtitle, { x: 0.35, y: 3.78, w: 3.3, h: 0.5, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.light, align: "left", margin: 0 });
+  }
+  // 日期
+  if (dateStr) {
+    slide.addText(dateStr, { x: 0.35, y: 4.72, w: 3.3, h: 0.3, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.headerText, align: "left", margin: 0 });
+  }
+
+  // ── 右侧区域：3 条关键结论摘要卡 ──────────────────────────
+  const cardY = [0.55, 2.1, 3.65];
+  (insights || []).slice(0, 3).forEach((ins, i) => {
+    const cy = cardY[i];
+    // 卡片背景
+    slide.addShape(pres.shapes.RECTANGLE, { x: 4.3, y: cy, w: 5.4, h: 1.3, fill: { color: theme.light }, line: { color: theme.border, width: 0.4 } });
+    // 左侧蓝色序号条
+    slide.addShape(pres.shapes.RECTANGLE, { x: 4.3, y: cy, w: 0.55, h: 1.3, fill: { color: i === 0 ? theme.primary : theme.secondary } });
+    // 序号
+    slide.addText(ins.num || String(i + 1).padStart(2, "0"), { x: 4.3, y: cy, w: 0.55, h: 1.3, fontSize: 14, fontFace: "Arial Black", color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0 });
+    // 结论标题
+    slide.addText(ins.headline, { x: 4.95, y: cy + 0.12, w: 4.65, h: 0.62, fontSize: 13, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "left", valign: "top", margin: 0, lineSpaceMult: 1.2 });
+    // 支撑说明
+    if (ins.detail) {
+      slide.addText(ins.detail, { x: 4.95, y: cy + 0.78, w: 4.65, h: 0.4, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "top", margin: 0 });
+    }
+  });
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+createRichCover(pres, theme,
+  "数字化转型可将运营成本降低 35%",
+  "战略咨询报告 · 2025年Q2",
+  "2025年 04月",
+  [
+    { num: "01", headline: "自动化流程使人工成本下降 28%", detail: "基于 12 家样本企业，18 个月跟踪数据" },
+    { num: "02", headline: "数据中台建设周期平均缩短 40%", detail: "标准化 API 接入，减少定制开发" },
+    { num: "03", headline: "客户满意度 NPS 提升 22 分", detail: "数字化渠道响应时效 < 2 小时" },
+  ],
+  "战略咨询报告"
+);
 ```
 
 ### TOC（目录）

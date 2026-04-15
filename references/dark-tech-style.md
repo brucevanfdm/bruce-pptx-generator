@@ -67,13 +67,14 @@ const theme = {
 内容区宽度: 9.1"
 ```
 
-**内容密度指引（演讲辅助型）：**
+**内容密度指引（产品发布型 — 精装标准）：**
 
-> 本风格定位为**产品发布 / 演讲辅助型**，每张幻灯片一个核心观点，信息量适度留白，视觉冲击优先。
+> 本风格定位为**产品发布 / 演讲辅助型**，每张幻灯片一个核心观点，视觉冲击优先，信息量适度留白但必须有数据支撑。
 
-- 每张内容页：核心条目 3–5 条，每条一句话（结论导向）
-- KPI 页：2–4 个核心数字，大字号显示
-- 纯视觉叙事页：允许只有标题 + 1 段短文字 + 大图形元素
+- 每张内容页：核心条目 **3–5 条**，每条需 tagline（结论导向）+ 数据支撑
+- **KPI 页：2–4 个核心数字，大字号 + 单位 + 变化率标签 + 底部洞察说明**
+- 纯视觉叙事页：允许只有标题 + 大图形元素，但需在图形旁配合洞察标签
+- **每张内容页至少包含 1 种非文字视觉**（图表 / 进度环 / 架构图 / 图标卡 / 流程图）
 - 避免文字墙，优先用卡片 / 图表代替段落
 
 ## 标志性设计元素
@@ -99,6 +100,54 @@ function addSlideTitleWithAccent(slide, pres, theme, title) {
     x: 0.95, y: 0.82, w: 8.6, h: 0.01,
     fill: { color: theme.border }
   });
+}
+```
+
+
+
+### 1.5 精装能力卡片（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addFeatureItem`**。精装卡片包含：顶部强调色条、编号圆形、标题、tagline、带前缀的 bullet 功能列表、底部洞察说明区。
+
+```javascript
+function addDarkRichCard(slide, pres, theme, x, y, w, h, num, title, tagline, features, detail, highlight) {
+  const accentColor = highlight ? theme.accent : theme.secondary;
+  const bgColor = highlight ? theme.light : theme.bg; // light="1E2A3A"(深灰卡片), bg="0D1B2A"(深海底)
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: bgColor }, line: { color: theme.border, width: 0.5 } });
+  // 顶部强调色条
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.07, fill: { color: accentColor } });
+
+  // 编号圆形
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.18, y: y + 0.2, w: 0.46, h: 0.46, fill: { color: accentColor } });
+  slide.addText(String(num), { x: x + 0.18, y: y + 0.2, w: 0.46, h: 0.46, fontSize: 14, fontFace: "Arial Black", color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0 });
+
+  // 标题
+  slide.addText(title, { x: x + 0.74, y: y + 0.16, w: w - 0.9, h: 0.34, fontSize: 13, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "left", valign: "middle", margin: 0 });
+
+  // Tagline
+  slide.addText(tagline, { x: x + 0.74, y: y + 0.5, w: w - 0.9, h: 0.26, fontSize: 9.5, fontFace: "Microsoft YaHei", color: accentColor, align: "left", valign: "middle", margin: 0 });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.15, y: y + 0.84, w: w - 0.3, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // Bullet 功能列表（带小方块前缀）
+  const featStartY = y + 0.94;
+  const featH = 0.4;
+  features.forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.18, y: fy + 0.13, w: 0.1, h: 0.1, fill: { color: accentColor } });
+    slide.addText(f, { x: x + 0.34, y: fy + 0.06, w: w - 0.5, h: featH - 0.12, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "middle", margin: 0 });
+  });
+
+  // 底部洞察说明区
+  if (detail) {
+    const footerY = y + h - 0.55;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.15, y: footerY, w: w - 0.3, h: 0.45, fill: { color: theme.bg }, line: { color: theme.border, width: 0.3 } }); // 深色背景，勿用FFFFFF
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.15, y: footerY, w: 0.05, h: 0.45, fill: { color: theme.secondary } });
+    slide.addText(detail, { x: x + 0.26, y: footerY, w: w - 0.46, h: 0.45, fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "middle", margin: 0 });
+  }
 }
 ```
 
@@ -725,6 +774,116 @@ slide.addText("2025年  ·  产品部", {
   fontSize: 12, fontFace: "Microsoft YaHei",
   color: theme.mutedText, align: "left", margin: 0
 });
+```
+
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 暗黑科技封面精装版。** 深色背景 + 左侧竖向强调色条 + 右侧 3 个发光科技感 KPI 卡，配合几何装饰块营造前沿感。
+
+```javascript
+/**
+ * @param {string} title      - 产品/技术名称（白色大字）
+ * @param {string} subtitle   - 副标题（青绿色）
+ * @param {string} dateStr    - 日期/部门
+ * @param {Array}  stats      - 右侧 3 个科技数据，每项 { value, unit, label }
+ *                              例：[{ value:"99.9%", unit:"", label:"系统可用性 SLA" }, ...]
+ * @param {string} tagBadge   - 左上角徽章文字（如"BETA"、"V2.0"），可选
+ */
+function createRichCover(pres, theme, title, subtitle, dateStr, stats, tagBadge) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 左侧竖向青绿主色条
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 0.14, h: 5.625, fill: { color: theme.secondary } });
+  // 右侧竖向电光蓝装饰条（细）
+  slide.addShape(pres.shapes.RECTANGLE, { x: 5.9, y: 0, w: 0.04, h: 5.625, fill: { color: theme.accent } });
+  // 底部全宽细线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 5.48, w: 10, h: 0.04, fill: { color: theme.secondary } });
+
+  // 左上角 Tag Badge（可选）
+  if (tagBadge) {
+    slide.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 0.22, w: 1.4, h: 0.38, fill: { color: theme.secondary } });
+    slide.addText(tagBadge, { x: 0.3, y: 0.22, w: 1.4, h: 0.38, fontSize: 12, fontFace: "Arial Black", color: theme.bg, bold: true, align: "center", valign: "middle", margin: 0 });
+  }
+
+  // 主标题
+  slide.addText(title, {
+    x: 0.3, y: 1.2, w: 5.3, h: 1.8,
+    fontSize: 42, fontFace: "Microsoft YaHei",
+    color: theme.primary, bold: true,
+    align: "left", valign: "top", margin: 0, lineSpaceMult: 1.2
+  });
+  // 电光蓝下划装饰线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 3.1, w: 2.2, h: 0.04, fill: { color: theme.accent } });
+
+  // 副标题
+  if (subtitle) {
+    slide.addText(subtitle, {
+      x: 0.3, y: 3.22, w: 5.3, h: 0.5,
+      fontSize: 17, fontFace: "Microsoft YaHei",
+      color: theme.secondary, align: "left", margin: 0
+    });
+  }
+
+  // 日期/部门
+  if (dateStr) {
+    slide.addText(dateStr, {
+      x: 0.3, y: 5.12, w: 4.0, h: 0.28,
+      fontSize: 11, fontFace: "Microsoft YaHei",
+      color: theme.mutedText, align: "left", margin: 0
+    });
+  }
+
+  // ── 右侧：3 个科技 KPI 卡 ─────────────────────────────────
+  const cardW = 3.72, cardH = 1.58, cardX = 6.1;
+  const cardYArr = [0.28, 2.02, 3.76];
+
+  (stats || []).slice(0, 3).forEach((s, i) => {
+    const cy = cardYArr[i];
+    const isFirst = i === 0;
+    const accentC = isFirst ? theme.secondary : theme.accent;
+
+    // 卡片背景
+    slide.addShape(pres.shapes.RECTANGLE, { x: cardX, y: cy, w: cardW, h: cardH, fill: { color: theme.light }, line: { color: accentC, width: 0.6 } });
+    // 顶部色条
+    slide.addShape(pres.shapes.RECTANGLE, { x: cardX, y: cy, w: cardW, h: 0.06, fill: { color: accentC } });
+
+    // 大数值
+    slide.addText(s.value, {
+      x: cardX + 0.12, y: cy + 0.1, w: cardW - 0.24, h: 0.95,
+      fontSize: 38, fontFace: "Arial Black",
+      color: accentC, bold: true,
+      align: "center", valign: "middle", margin: 0
+    });
+    // 单位
+    if (s.unit) {
+      slide.addText(s.unit, { x: cardX + cardW * 0.55, y: cy + 0.14, w: cardW * 0.42, h: 0.28, fontSize: 13, fontFace: "Arial Black", color: accentC, bold: true, align: "left", margin: 0 });
+    }
+    // 标签
+    slide.addText(s.label, {
+      x: cardX + 0.12, y: cy + 1.1, w: cardW - 0.24, h: 0.4,
+      fontSize: 11, fontFace: "Microsoft YaHei",
+      color: theme.mutedText, align: "center", margin: 0
+    });
+  });
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+createRichCover(pres, theme,
+  "AI 推理加速引擎\nNovaCore 2.0",
+  "重新定义边缘计算的边界",
+  "2025年 04月  ·  AI 基础设施部",
+  [
+    { value: "99.9%", unit: "", label: "系统可用性 SLA" },
+    { value: "3ms",   unit: "",  label: "端到端推理延迟" },
+    { value: "10×",  unit: "",  label: "较上代性能提升" },
+  ],
+  "V2.0"
+);
 ```
 
 ### TOC（目录）

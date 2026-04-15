@@ -65,13 +65,14 @@ const theme = {
 - 数字必须是 Traction（真实进展），不是假设预测
 - 最后一页必须有 CTA（下一步行动）
 
-**内容密度指引（说服驱动型）：**
+**内容密度指引（说服驱动型 — 精装标准）：**
 
 > 本风格定位为**说服驱动型**：每张幻灯片一个核心主张，用数字和简洁支撑点证明它。
 
-- 每张内容页：1 个核心主张 + 2–4 个支撑点
-- Traction 页：3–5 个大数字，每个配简短标签
-- 禁止长段落——超过 2 行的文字必须拆成要点
+- 每张内容页：1 个核心主张 + **3–5 个支撑点**（每点需 tagline + 数据支撑）
+- **Traction 页：3–5 个大数字，每个配简短标签 + 趋势箭头 + 底部洞察说明**
+- 禁止长段落——超过 2 行的文字必须拆成带前缀的要点列表
+- **每张内容页至少包含 1 种非文字视觉**（进度环 / 数据条 / 里程碑图 / KPI 卡）
 
 ## 标志性设计元素
 
@@ -93,6 +94,56 @@ function addPitchSlideTitle(slide, pres, theme, title) {
     color: theme.primary, bold: true,
     align: "left", valign: "middle", margin: 0
   });
+}
+```
+
+
+
+### 1.5 精装能力卡片（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addTractionCard` + `addPitchBullets` 组合**。精装卡片包含：顶部强调色条、KPI 大数值、单位、tagline、带前缀的 bullet 列表、底部洞察说明区。
+
+```javascript
+function addPitchRichCard(slide, pres, theme, x, y, w, h, value, unit, label, tagline, features, detail, highlight) {
+  const accentColor = highlight ? theme.accent : theme.secondary;
+  const bgColor = highlight ? "FEF3C7" : theme.light; // 高亮用浅琥珀（配accent F59E0B），普通用冷白
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: bgColor }, line: { color: theme.border, width: 0.5 } });
+  // 顶部强调色条
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.07, fill: { color: accentColor } });
+
+  // KPI 大数值
+  slide.addText(value, { x: x + 0.1, y: y + 0.18, w: w - 0.2, h: 0.72, fontSize: 40, fontFace: "Arial Black", color: accentColor, bold: true, align: "center", valign: "middle", margin: 0 });
+  if (unit) {
+    slide.addText(unit, { x: x + w * 0.52, y: y + 0.22, w: w * 0.45, h: 0.26, fontSize: 11, fontFace: "Microsoft YaHei", color: accentColor, bold: true, align: "left", valign: "top", margin: 0 });
+  }
+
+  // 标签
+  slide.addText(label, { x: x + 0.1, y: y + 0.94, w: w - 0.2, h: 0.3, fontSize: 12, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", margin: 0 });
+
+  // Tagline
+  slide.addText(tagline, { x: x + 0.1, y: y + 1.26, w: w - 0.2, h: 0.28, fontSize: 9.5, fontFace: "Microsoft YaHei", color: accentColor, align: "center", margin: 0 });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.1, y: y + 1.6, w: w - 0.2, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // Bullet 功能列表（带小方块前缀）
+  const featStartY = y + 1.68;
+  const featH = 0.4;
+  features.forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.12, y: fy + 0.13, w: 0.1, h: 0.1, fill: { color: accentColor } });
+    slide.addText(f, { x: x + 0.28, y: fy + 0.06, w: w - 0.42, h: featH - 0.12, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "middle", margin: 0 });
+  });
+
+  // 底部洞察说明区
+  if (detail) {
+    const footerY = y + h - 0.55;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: w - 0.2, h: 0.45, fill: { color: "FFFFFF" }, line: { color: theme.border, width: 0.3 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: 0.05, h: 0.45, fill: { color: theme.mutedText } });
+    slide.addText(detail, { x: x + 0.2, y: footerY, w: w - 0.38, h: 0.45, fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "middle", margin: 0 });
+  }
 }
 ```
 
@@ -661,6 +712,106 @@ slide.addText("2025  ·  产品部", {
   fontSize: 12, fontFace: "Microsoft YaHei",
   color: theme.mutedText, align: "left", margin: 0
 });
+```
+
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 路演封面精装版。** 右侧 3 个 Traction 数字用大字冲击，让投资人第一眼就感受到规模感。
+
+```javascript
+/**
+ * @param {string} title      - 项目/产品名（大字，左对齐）
+ * @param {string} tagline    - 一句话说清楚在做什么（靛蓝色）
+ * @param {string} dateStr    - 日期/阶段/公司名
+ * @param {Array}  traction   - 右侧 3 个牵引力数字，每项 { value, unit, label }
+ *                              例：[{ value:"2.1万", unit:"", label:"付费用户" }, ...]
+ * @param {string} stage      - 融资阶段标签（如"Pre-A 轮"），显示在右上角，可选
+ */
+function createRichCover(pres, theme, title, tagline, dateStr, traction, stage) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 顶部琥珀橙全宽强调线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.06, fill: { color: theme.accent } });
+
+  // 左侧：主标题
+  slide.addText(title, {
+    x: 0.5, y: 0.9, w: 5.6, h: 2.0,
+    fontSize: 46, fontFace: "Microsoft YaHei",
+    color: theme.primary, bold: true,
+    align: "left", valign: "top", margin: 0, lineSpaceMult: 1.2
+  });
+
+  // Tagline
+  if (tagline) {
+    slide.addText(tagline, {
+      x: 0.5, y: 3.1, w: 5.6, h: 0.62,
+      fontSize: 18, fontFace: "Microsoft YaHei",
+      color: theme.secondary, align: "left", margin: 0
+    });
+  }
+
+  // 底部信息条
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 5.2, w: 10, h: 0.425, fill: { color: theme.primary } });
+  slide.addText(dateStr || "", {
+    x: 0.5, y: 5.2, w: 5.0, h: 0.425,
+    fontSize: 11, fontFace: "Microsoft YaHei",
+    color: "FFFFFF", align: "left", valign: "middle", margin: 0
+  });
+
+  // ── 右侧：3 个 Traction 数字 ──────────────────────────────
+  if (stage) {
+    // 融资阶段标签（右上角）
+    slide.addShape(pres.shapes.RECTANGLE, { x: 7.6, y: 0.18, w: 2.1, h: 0.46, fill: { color: theme.secondary } });
+    slide.addText(stage, { x: 7.6, y: 0.18, w: 2.1, h: 0.46, fontSize: 13, fontFace: "Microsoft YaHei", color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0 });
+  }
+
+  // 垂直分隔线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 6.5, y: 0.9, w: 0.04, h: 4.1, fill: { color: theme.border } });
+
+  const cardY = [0.85, 2.32, 3.79];
+  (traction || []).slice(0, 3).forEach((t, i) => {
+    const cy = cardY[i];
+    // 数字
+    slide.addText(t.value, {
+      x: 6.72, y: cy, w: 3.0, h: 1.0,
+      fontSize: 52, fontFace: "Arial Black",
+      color: i === 0 ? theme.accent : theme.secondary, bold: true,
+      align: "left", valign: "middle", margin: 0
+    });
+    // 单位
+    if (t.unit) {
+      slide.addText(t.unit, { x: 8.0, y: cy + 0.08, w: 1.6, h: 0.38, fontSize: 16, fontFace: "Arial Black", color: theme.secondary, bold: true, align: "left", margin: 0 });
+    }
+    // 标签
+    slide.addText(t.label, {
+      x: 6.72, y: cy + 0.88, w: 3.0, h: 0.32,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: theme.mutedText, align: "left", margin: 0
+    });
+    // 细分隔线（最后一项不加）
+    if (i < 2) {
+      slide.addShape(pres.shapes.RECTANGLE, { x: 6.72, y: cy + 1.24, w: 2.8, h: 0.02, fill: { color: theme.border } });
+    }
+  });
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+createRichCover(pres, theme,
+  "智慧医疗\n随访平台",
+  "让慢病管理像发消息一样简单",
+  "2025年 04月  ·  健康科技",
+  [
+    { value: "2.1万", unit: "", label: "月活付费用户" },
+    { value: "320%", unit: "", label: "环比年增长率" },
+    { value: "87",   unit: "分", label: "用户 NPS 净推荐值" },
+  ],
+  "Pre-A 轮"
+);
 ```
 
 ### TOC（目录）

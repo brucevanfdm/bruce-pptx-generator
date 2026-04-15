@@ -66,14 +66,32 @@ const theme = {
 - 禁止装饰性色块、阴影、渐变——留白本身就是设计
 - 文字左对齐或居中二选一，全片统一
 
-**内容密度指引（演讲辅助型）：**
+**内容密度指引（演讲辅助型 — 精装标准）：**
 
-> 本风格定位为**视觉叙事型**：每张幻灯片一句话或一个数字，辅以极少量说明。
+> 本风格定位为**视觉叙事型**：每张幻灯片一个核心主张，配套数据/洞察和视觉叙事元素。
 
-- 标题页 / Hero 页：仅标题 + 可选一行副标题
-- 数据页：1–3 个 KPI，不要更多
-- 要点页：最多 4 条，每条 ≤ 10 字（中文）
+- 标题页 / Hero 页：仅标题 + 可选一行副标题（可加装饰性几何图形）
+- 数据页：1–3 个 KPI，配趋势箭头或变化率标签
+- **要点页：3–5 条，每条需有 tagline（10–20 字）+ 底部洞察说明**
+- **每张内容页至少包含 1 种非文字视觉**（装饰 SVG / KPI 卡 / 图表 / 图标矩阵）
 - 禁止任何形式的文字墙
+
+
+
+## 视觉选择决策树
+
+| 内容类型 | 推荐组件（精装优先） |
+|---------|---------|
+| **核心主张 / 要点页** | **`addAppleRichCard`**（tagline + bullet + 底部洞察） |
+| **数据 / KPI 页** | **`addAppleKPI`** + 趋势标签 |
+| **对比 / 构成** | `addAppleChart(BAR/PIE)` |
+| **流程 / 时间线** | `makeAppleTimeline` (SVG) |
+| **层级 / 架构** | `makeAppleHierarchy` (SVG) |
+| **并列要点（降级）** | `addAppleBullets` |
+
+**强制规则：**
+- **每张 Content 页至少包含 1 种非文字视觉元素**
+- 基础 `addHeroStatement` + `addAppleBullets` 视为毛坯房组合，优先用 `addAppleRichCard` 替代
 
 ## 标志性设计元素
 
@@ -90,7 +108,56 @@ function addAppleSlideTitle(slide, theme, title) {
 }
 ```
 
-### 2. 页码（极简点）
+
+### 1.5 精装能力卡片（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addAppleKPI` + `addAppleBullets` 组合**。精装卡片包含：顶部强调色条、KPI 大数值、单位、tagline、带前缀的 bullet 列表、底部洞察说明区。
+
+```javascript
+function addAppleRichCard(slide, pres, theme, x, y, w, h, value, unit, label, tagline, features, detail, highlight) {
+  const accentColor = highlight ? theme.accent : theme.secondary;
+  const bgColor = theme.light; // Apple 无橙色，高亮通过顶部色条和 accentColor 区分
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: bgColor }, line: { color: theme.border, width: 0.5 } });
+  // 顶部强调色条
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.07, fill: { color: accentColor } });
+
+  // KPI 大数值
+  slide.addText(value, { x: x + 0.1, y: y + 0.18, w: w - 0.2, h: 0.7, fontSize: 38, fontFace: "Arial Black", color: accentColor, bold: true, align: "center", valign: "middle", margin: 0 });
+  if (unit) {
+    slide.addText(unit, { x: x + w * 0.52, y: y + 0.22, w: w * 0.45, h: 0.26, fontSize: 11, fontFace: "Microsoft YaHei", color: accentColor, bold: true, align: "left", valign: "top", margin: 0 });
+  }
+
+  // 标签
+  slide.addText(label, { x: x + 0.1, y: y + 0.92, w: w - 0.2, h: 0.3, fontSize: 12, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", margin: 0 });
+
+  // Tagline
+  slide.addText(tagline, { x: x + 0.1, y: y + 1.24, w: w - 0.2, h: 0.28, fontSize: 9.5, fontFace: "Microsoft YaHei", color: accentColor, align: "center", margin: 0 });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.1, y: y + 1.58, w: w - 0.2, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // Bullet 功能列表（带小方块前缀）
+  const featStartY = y + 1.66;
+  const featH = 0.38;
+  features.forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.12, y: fy + 0.12, w: 0.1, h: 0.1, fill: { color: accentColor } });
+    slide.addText(f, { x: x + 0.28, y: fy + 0.05, w: w - 0.42, h: featH - 0.1, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "middle", margin: 0 });
+  });
+
+  // 底部洞察说明区
+  if (detail) {
+    const footerY = y + h - 0.55;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: w - 0.2, h: 0.45, fill: { color: "FFFFFF" }, line: { color: theme.border, width: 0.3 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: 0.05, h: 0.45, fill: { color: theme.mutedText } });
+    slide.addText(detail, { x: x + 0.2, y: footerY, w: w - 0.38, h: 0.45, fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "middle", margin: 0 });
+  }
+}
+```
+
+## 2. 页码（极简点）
 
 ```javascript
 function addPageBadge(slide, pres, theme, num) {
@@ -232,6 +299,101 @@ slide.addText("一句话定位 · 年份", {
   fontSize: 20, fontFace: "Microsoft YaHei",
   color: theme.secondary, align: "center", margin: 0
 });
+```
+
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 苹果极简封面精装版。** 遵守"一页只有一个焦点"原则：右侧加单个大数字焦点（或产品核心指标），用细线和留白构成视觉层次，绝不堆砌色块。
+
+```javascript
+/**
+ * @param {string} title      - 产品/演讲主标题（大字，居中偏左）
+ * @param {string} subtitle   - 副标题（一行）
+ * @param {string} dateStr    - 日期或演讲者
+ * @param {object} spotlight  - 右侧焦点数字，{ value, unit, label }
+ *                              例：{ value: "40%", unit: "↑", label: "用户留存提升" }
+ *                              如不需要，传 null
+ */
+function createRichCover(pres, theme, title, subtitle, dateStr, spotlight) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 顶部苹果蓝细线（全宽，极细）
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.04, fill: { color: theme.accent } });
+
+  // 主标题（左对齐，大字）
+  slide.addText(title, {
+    x: 0.8, y: 1.4, w: spotlight ? 5.4 : 8.4, h: 2.0,
+    fontSize: 44, fontFace: "Microsoft YaHei",
+    color: theme.primary, bold: true,
+    align: "left", valign: "top", margin: 0, lineSpaceMult: 1.25
+  });
+
+  // 副标题
+  if (subtitle) {
+    slide.addText(subtitle, {
+      x: 0.8, y: 3.55, w: 5.4, h: 0.5,
+      fontSize: 18, fontFace: "Microsoft YaHei",
+      color: theme.secondary, align: "left", margin: 0
+    });
+  }
+
+  // 日期/演讲者
+  if (dateStr) {
+    slide.addText(dateStr, {
+      x: 0.8, y: 5.15, w: 4.0, h: 0.3,
+      fontSize: 12, fontFace: "Microsoft YaHei",
+      color: theme.mutedText, align: "left", margin: 0
+    });
+  }
+
+  // 底部全宽细分隔线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.8, y: 5.08, w: 8.4, h: 0.02, fill: { color: theme.border } });
+
+  // ── 右侧焦点数字（可选）────────────────────────────────────
+  if (spotlight) {
+    // 垂直分隔线
+    slide.addShape(pres.shapes.RECTANGLE, { x: 6.6, y: 1.2, w: 0.02, h: 3.4, fill: { color: theme.border } });
+
+    // 大数字
+    slide.addText(spotlight.value, {
+      x: 6.85, y: 1.5, w: 2.85, h: 1.8,
+      fontSize: 80, fontFace: "Arial Black",
+      color: theme.accent, bold: true,
+      align: "center", valign: "middle", margin: 0
+    });
+    // 单位（右上角小字）
+    if (spotlight.unit) {
+      slide.addText(spotlight.unit, {
+        x: 7.5, y: 1.55, w: 1.5, h: 0.4,
+        fontSize: 22, fontFace: "Arial Black",
+        color: theme.accent, bold: true, align: "left", margin: 0
+      });
+    }
+    // 标签
+    slide.addText(spotlight.label, {
+      x: 6.85, y: 3.42, w: 2.85, h: 0.42,
+      fontSize: 14, fontFace: "Microsoft YaHei",
+      color: theme.secondary, align: "center", margin: 0
+    });
+  }
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+// 有焦点数字版
+createRichCover(pres, theme,
+  "重新定义\n医疗随访体验",
+  "AI 智能随访平台 · 产品发布",
+  "2025年 04月",
+  { value: "95%", unit: "+", label: "随访完成率" }
+);
+
+// 纯极简版（无焦点数字）
+createRichCover(pres, theme, "人人都能用的 AI", "产品路线图 2025", "April 2025", null);
 ```
 
 ### TOC（目录）

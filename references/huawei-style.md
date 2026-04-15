@@ -76,14 +76,15 @@ const theme = {
 - 卡片间距：`≥ 0.15"`
 - 三栏等分：每栏宽约 `2.87"`，间距 `0.15"`
 
-**内容密度指引（方案汇报型）：**
+**内容密度指引（方案汇报型 — 精装标准）：**
 
-> 本风格定位为**方案汇报型**：每张幻灯片一个核心主张，配套 3–5 个模块化要点。
+> 本风格定位为**方案汇报型**：每张幻灯片一个核心主张，配套 4–6 个模块化要点，每个要点必须有数据支撑、tagline 和底部说明。
 
-- 每张内容页：要点 3–5 个（最多 6 个）
-- 每个要点：标题 ≤ 20 字 + 支撑说明 1–3 行
+- 每张内容页：要点 4–6 个（超出 6 个拆页，少于 4 个增加 tagline/数据/洞察补满空间）
+- 每个要点：标题 ≤ 20 字 + tagline 1 句（12–20 字）+ 支撑说明 2–4 行
 - 数据表格：最多 7 行 × 5 列
 - 标题：必须是功能句或价值句，例："三层防护架构确保数据安全合规"
+- **强制要求**：每张内容页至少包含 1 个非纯文字视觉元素（SVG 图标 / 流程图 / 进度环 / 对比矩阵 / KPI 卡）
 
 ## 标志性设计元素
 
@@ -200,6 +201,116 @@ function addHuaweiNumberedCard(slide, pres, theme, x, y, w, h, num, title, desc,
       color: theme.bodyText, align: "left", valign: "top", margin: 0
     });
   }
+}
+```
+
+### 3.5 精装能力卡片（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addHuaweiNumberedCard`**。精装卡片包含：顶部强调线、编号圆形、标题、Tagline、带前缀的 bullet 功能列表、底部说明区。
+
+```javascript
+function addHuaweiRichCard(slide, pres, theme, x, y, w, h, num, title, tagline, features, detail, highlight) {
+  const borderColor = highlight ? theme.accent : theme.secondary;
+  const bgColor = highlight ? theme.orangeLight : theme.light;
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: bgColor }, line: { color: theme.border, width: 0.5 } });
+  // 顶部强调线
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.07, fill: { color: borderColor } });
+
+  // 编号圆形
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.18, y: y + 0.2, w: 0.5, h: 0.5, fill: { color: borderColor } });
+  slide.addText(String(num), {
+    x: x + 0.18, y: y + 0.2, w: 0.5, h: 0.5,
+    fontSize: 16, fontFace: "Arial Black",
+    color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0
+  });
+
+  // 标题
+  slide.addText(title, {
+    x: x + 0.78, y: y + 0.14, w: w - 0.95, h: 0.34,
+    fontSize: 14, fontFace: "Microsoft YaHei",
+    color: highlight ? theme.accent : theme.primary, bold: true,
+    align: "left", valign: "middle", margin: 0
+  });
+
+  // Tagline
+  slide.addText(tagline, {
+    x: x + 0.78, y: y + 0.48, w: w - 0.95, h: 0.26,
+    fontSize: 9.5, fontFace: "Microsoft YaHei",
+    color: borderColor, bold: false,
+    align: "left", valign: "middle", margin: 0
+  });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.15, y: y + 0.82, w: w - 0.3, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // Bullet 功能列表（带小方块前缀）
+  const featStartY = y + 0.92;
+  const featH = h < 2.0 ? 0.36 : 0.42;
+
+  features.forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.18, y: fy + 0.12, w: 0.12, h: 0.12, fill: { color: borderColor } });
+    slide.addText(f, {
+      x: x + 0.38, y: fy + 0.05, w: w - 0.55, h: featH - 0.1,
+      fontSize: 10, fontFace: "Microsoft YaHei", color: theme.bodyText,
+      align: "left", valign: "middle", margin: 0
+    });
+  });
+
+  // 底部说明区（如果有）
+  if (detail) {
+    const footerY = y + h - 0.58;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.15, y: footerY, w: w - 0.3, h: 0.48, fill: { color: "FFFFFF" }, line: { color: theme.border, width: 0.3 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.15, y: footerY, w: 0.06, h: 0.48, fill: { color: theme.mutedText } });
+    slide.addText(detail, {
+      x: x + 0.28, y: footerY, w: w - 0.45, h: 0.48,
+      fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText,
+      align: "left", valign: "middle", margin: 0
+    });
+  }
+}
+```
+
+### 3.6 痛点分析卡片（Pain Point Card）
+
+适用于痛点/场景分析页。包含：顶部橙线、编号、标题、问题副标题、详细描述、数据影响标签，以及可选的 SVG 图标。
+
+```javascript
+function svgToBase64(svgStr) {
+  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+}
+
+function makePainPointCard(slide, pres, theme, x, y, w, h, num, title, subtitle, desc, impact, iconSvg) {
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: theme.light }, line: { color: theme.border, width: 0.5 } });
+  // 顶部橙线
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.06, fill: { color: theme.accent } });
+  // 左侧竖条
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w: 0.06, h, fill: { color: theme.accent } });
+
+  // 编号
+  slide.addShape(pres.shapes.OVAL, { x: x + 0.18, y: y + 0.18, w: 0.48, h: 0.48, fill: { color: theme.accent } });
+  slide.addText(String(num), { x: x + 0.18, y: y + 0.18, w: 0.48, h: 0.48, fontSize: 16, fontFace: "Arial Black", color: "FFFFFF", bold: true, align: "center", valign: "middle", margin: 0 });
+
+  // SVG 图标（右上角）
+  if (iconSvg) {
+    const iconData = svgToBase64(`<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">${iconSvg}</svg>`);
+    slide.addImage({ data: iconData, x: x + w - 0.95, y: y + 0.15, w: 0.75, h: 0.75 });
+  }
+
+  // 标题
+  slide.addText(title, { x: x + 0.78, y: y + 0.12, w: w - 1.85, h: 0.32, fontSize: 14, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "left", valign: "middle", margin: 0 });
+  // 副标题
+  slide.addText(subtitle, { x: x + 0.78, y: y + 0.44, w: w - 1.85, h: 0.28, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.accent, bold: true, align: "left", valign: "middle", margin: 0 });
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.15, y: y + 0.78, w: w - 0.3, h: 0, line: { color: theme.border, width: 0.5 } });
+  // 描述
+  slide.addText(desc, { x: x + 0.15, y: y + 0.84, w: w - 0.3, h: h - 1.12, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "top", margin: 0, lineSpaceMult: 1.4 });
+  // 影响标签
+  slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.15, y: y + h - 0.38, w: 0.06, h: 0.28, fill: { color: theme.secondary } });
+  slide.addText(impact, { x: x + 0.26, y: y + h - 0.38, w: w - 0.4, h: 0.28, fontSize: 9, fontFace: "Microsoft YaHei", color: theme.secondary, align: "left", valign: "middle", margin: 0 });
 }
 ```
 
@@ -899,10 +1010,12 @@ addHuaweiRadarChart(slide, pres, theme, 0.4, 1.1, 5.5, 4.0,
 
 ## 视觉选择决策树
 
-根据内容类型选择合适的视觉组件，避免全文字布局：
+根据内容类型选择合适的视觉组件，避免全文字布局。**优先使用精装组件，基础组件仅作为降级方案。**
 
-| 内容类型 | 推荐组件 |
+| 内容类型 | 推荐组件（精装优先） |
 |---------|---------|
+| 产品能力/功能模块 | **`addHuaweiRichCard`**（tagline + bullet + 底部说明） |
+| 痛点/场景分析 | **`makePainPointCard`**（图标 + 数据标签 + 副标题） |
 | 时间序列趋势 | `addHuaweiChart(LINE)` |
 | 类别对比（5 项以内） | `addHuaweiChart(BAR)` |
 | 数据 + 洞察 | `createChartWithInsightsSlide` |
@@ -917,10 +1030,13 @@ addHuaweiRadarChart(slide, pres, theme, 0.4, 1.1, 5.5, 4.0,
 | 方案选型对比 | `addHuaweiComparisonGrid` |
 | 多维能力评分 | `addHuaweiRadarChart` |
 | 战略分析框架 | `createHuaweiSWOTSlide` |
-| 模块化要点 | `addHuaweiNumberedCard` |
+| 模块化要点（降级） | `addHuaweiNumberedCard` |
 | 层级要点 | `addHuaweiBulletSection` |
 
-**每张 Content 页至少包含一种非纯文字的视觉组件（图表、架构图、SVG 图形、数据卡），除非内容本身是纯文字的政策/声明性内容。**
+**强制规则：**
+- **每张 Content 页至少包含一种非纯文字的视觉组件**（SVG 图标、流程图、进度环、架构图、数据卡、KPI 卡）
+- **封面页必须有装饰性视觉元素**（几何图形、能力矩阵、数据流线等），禁止只有标题+日期
+- **基础 `addHuaweiNumberedCard(title, desc)` 视为毛坯房组件**，仅在空间极度受限时使用
 
 ## 5 种页面类型
 
@@ -994,6 +1110,101 @@ function createHuaweiCoverSlide(pres, theme, title, subtitle, tag, dateStr) {
 
   return slide;
 }
+```
+
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 替代基础 `createHuaweiCoverSlide`。** 增加右侧能力矩阵卡片（3 个关键指标或能力标签），以及底部价值条，让封面不再是纯文字。
+
+```javascript
+/**
+ * @param {string} title       - 演示主标题
+ * @param {string} subtitle    - 副标题/定位语（1 行）
+ * @param {string} tag         - 方案/产品标签（如"智慧医疗解决方案"）
+ * @param {string} dateStr     - 日期或公司名
+ * @param {Array}  metrics     - 右侧 3 个关键指标，每项 { value, unit, label }
+ *                               例：[{ value: "95%", unit: "", label: "识别准确率" }, ...]
+ * @param {string} valueSlogan - 右侧价值主张大字（1–2 行）
+ */
+function createRichCover(pres, theme, title, subtitle, tag, dateStr, metrics, valueSlogan) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 左侧深蓝主色带
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 4.4, h: 5.625, fill: { color: theme.primary } });
+  // 橙色边界细线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 4.4, y: 0, w: 0.06, h: 5.625, fill: { color: theme.accent } });
+  // 左下角次色填充块
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 4.5, w: 4.4, h: 1.125, fill: { color: theme.secondary } });
+  // 橙色装饰横线（标题上方）
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.4, y: 1.1, w: 1.0, h: 0.06, fill: { color: theme.accent } });
+
+  // 方案标签
+  if (tag) {
+    slide.addText(tag, { x: 0.4, y: 1.24, w: 3.6, h: 0.3, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.light, align: "left", margin: 0 });
+  }
+  // 主标题
+  slide.addText(title, { x: 0.4, y: 1.62, w: 3.6, h: 2.0, fontSize: 26, fontFace: "Microsoft YaHei", color: "FFFFFF", bold: true, align: "left", valign: "top", margin: 0, lineSpaceMult: 1.3 });
+  // 副标题
+  if (subtitle) {
+    slide.addText(subtitle, { x: 0.4, y: 3.72, w: 3.6, h: 0.5, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.light, align: "left", margin: 0 });
+  }
+  // 日期/公司
+  if (dateStr) {
+    slide.addText(dateStr, { x: 0.4, y: 4.62, w: 3.6, h: 0.32, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.headerText, align: "left", margin: 0 });
+  }
+
+  // ── 右侧区域 ──────────────────────────────────────────────
+  // 价值主张大字
+  if (valueSlogan) {
+    slide.addText(valueSlogan, { x: 4.7, y: 0.6, w: 5.0, h: 0.9, fontSize: 18, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "left", valign: "middle", margin: 0, lineSpaceMult: 1.3 });
+    // 蓝色强调下划线
+    slide.addShape(pres.shapes.RECTANGLE, { x: 4.7, y: 1.56, w: 1.4, h: 0.05, fill: { color: theme.accent } });
+  }
+
+  // 3 个关键指标卡（横排）
+  if (metrics && metrics.length > 0) {
+    const cardW = 1.52, cardH = 1.55, cardY = 1.82, gap = 0.1;
+    metrics.slice(0, 3).forEach((m, i) => {
+      const cx = 4.7 + i * (cardW + gap);
+      // 卡片背景
+      slide.addShape(pres.shapes.RECTANGLE, { x: cx, y: cardY, w: cardW, h: cardH, fill: { color: theme.light }, line: { color: theme.border, width: 0.5 } });
+      // 顶部橙色条
+      slide.addShape(pres.shapes.RECTANGLE, { x: cx, y: cardY, w: cardW, h: 0.06, fill: { color: i === 0 ? theme.accent : theme.secondary } });
+      // 数值
+      slide.addText(m.value, { x: cx + 0.06, y: cardY + 0.12, w: cardW - 0.12, h: 0.78, fontSize: 34, fontFace: "Arial Black", color: i === 0 ? theme.accent : theme.secondary, bold: true, align: "center", valign: "middle", margin: 0 });
+      // 单位
+      if (m.unit) {
+        slide.addText(m.unit, { x: cx + cardW * 0.55, y: cardY + 0.16, w: cardW * 0.42, h: 0.22, fontSize: 10, fontFace: "Microsoft YaHei", color: i === 0 ? theme.accent : theme.secondary, bold: true, align: "left", valign: "top", margin: 0 });
+      }
+      // 标签
+      slide.addText(m.label, { x: cx + 0.06, y: cardY + 0.94, w: cardW - 0.12, h: 0.52, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", valign: "middle", margin: 0, lineSpaceMult: 1.2 });
+    });
+  }
+
+  // 底部价值标语条（右侧）
+  slide.addShape(pres.shapes.RECTANGLE, { x: 4.7, y: 4.72, w: 5.0, h: 0.62, fill: { color: theme.light } });
+  slide.addShape(pres.shapes.RECTANGLE, { x: 4.7, y: 4.72, w: 0.06, h: 0.62, fill: { color: theme.accent } });
+  slide.addText("以技术驱动价值，以数据创造洞察", { x: 4.82, y: 4.72, w: 4.8, h: 0.62, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.primary, align: "left", valign: "middle", margin: 0 });
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+createRichCover(pres, theme,
+  "AI 智能运营平台",           // title
+  "赋能医疗机构数字化转型",     // subtitle
+  "解决方案 · 2025",           // tag
+  "2025年 04月",               // dateStr
+  [
+    { value: "95%", unit: "+", label: "慢病随访\n完成率" },
+    { value: "1.18", unit: "亿", label: "覆盖空巢\n老人规模" },
+    { value: "40%", unit: "↓", label: "运营成本\n降幅" },
+  ],
+  "让每一次随访都精准有效，\n让每一条数据都产生价值"  // valueSlogan
+);
 ```
 
 ### TOC（目录）

@@ -69,13 +69,14 @@ const theme = {
 - 来源注释：左下角，`mutedText` 9pt
 - 所有图表必须有标题（图表说明什么），不依赖听众自行解读
 
-**内容密度指引（数据汇报型）：**
+**内容密度指引（数据汇报型 — 精装标准）：**
 
 > 本风格定位为**数据汇报型**：每张幻灯片一个核心发现，用图表/表格证明，用一行文字点出结论。
 
-- 每张内容页：1 个核心发现 + 1 个主图表/表格 + 1–3 行分析说明
-- KPI 页：4–6 个指标，配变化趋势
-- 对比页：2 组数据，明确标出差异
+- 每张内容页：1 个核心发现 + **1 个主图表/表格 + 3–5 行分析洞察说明**
+- **KPI 页：4–6 个指标，每个配变化趋势 + 洞察标签（不能只有数字）**
+- 对比页：2 组数据，明确标出差异 + 数据来源
+- **每张内容页至少包含 1 种数据可视化组件**（图表 / KPI 卡 / 趋势线 / 对比矩阵）
 - 禁止在一页放两个以上图表（除非是同一指标的不同维度拆分）
 
 ## 标志性设计元素
@@ -168,6 +169,59 @@ function addKPIChangeCard(slide, pres, theme, x, y, w, value, label, change, isP
     fontSize: 11, fontFace: "Microsoft YaHei",
     color: theme.mutedText, align: "center", margin: 0
   });
+}
+```
+
+### 3.5 精装数据洞察卡（Rich Card）—— 推荐默认使用
+
+**优先使用此组件替代基础的 `addKPIChangeCard`**。精装卡片包含：顶部数据蓝强调线、KPI 大数值、变化率标签、tagline、带前缀的分析要点列表、底部数据来源/洞察区。
+
+```javascript
+function addDataRichCard(slide, pres, theme, x, y, w, h, value, unit, change, isPositive, label, tagline, findings, insight) {
+  const changeColor = isPositive ? theme.positive : theme.accent;
+  const changeSymbol = isPositive ? "↑" : "↓";
+
+  // 卡片背景
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h, fill: { color: theme.light }, line: { color: theme.border, width: 0.5 } });
+  // 顶部数据蓝强调线
+  slide.addShape(pres.shapes.RECTANGLE, { x, y, w, h: 0.06, fill: { color: theme.secondary } });
+
+  // KPI 大数值
+  slide.addText(value, { x: x + 0.1, y: y + 0.1, w: w - 0.2, h: 0.7, fontSize: 44, fontFace: "Arial Black", color: theme.secondary, bold: true, align: "center", valign: "middle", margin: 0 });
+  if (unit) {
+    slide.addText(unit, { x: x + w * 0.54, y: y + 0.14, w: w * 0.43, h: 0.26, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.secondary, bold: true, align: "left", valign: "top", margin: 0 });
+  }
+
+  // 变化率标签
+  if (change) {
+    slide.addText(`${changeSymbol} ${change}`, { x: x + 0.1, y: y + 0.82, w: w - 0.2, h: 0.28, fontSize: 16, fontFace: "Arial Black", color: changeColor, bold: true, align: "center", margin: 0 });
+  }
+
+  // 标签
+  slide.addText(label, { x: x + 0.1, y: y + 1.12, w: w - 0.2, h: 0.28, fontSize: 11, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", margin: 0 });
+
+  // Tagline
+  slide.addText(tagline, { x: x + 0.1, y: y + 1.42, w: w - 0.2, h: 0.26, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.secondary, align: "center", margin: 0 });
+
+  // 分隔线
+  slide.addShape(pres.shapes.LINE, { x: x + 0.1, y: y + 1.74, w: w - 0.2, h: 0, line: { color: theme.border, width: 0.5 } });
+
+  // 分析要点列表（带圆点前缀）
+  const featStartY = y + 1.82;
+  const featH = 0.36;
+  (findings || []).forEach((f, i) => {
+    const fy = featStartY + i * featH;
+    slide.addShape(pres.shapes.OVAL, { x: x + 0.14, y: fy + 0.12, w: 0.1, h: 0.1, fill: { color: theme.secondary } });
+    slide.addText(f, { x: x + 0.3, y: fy + 0.04, w: w - 0.44, h: featH - 0.08, fontSize: 9.5, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", valign: "middle", margin: 0 });
+  });
+
+  // 底部洞察/来源区
+  if (insight) {
+    const footerY = y + h - 0.52;
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: w - 0.2, h: 0.42, fill: { color: theme.bg }, line: { color: theme.border, width: 0.3 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.1, y: footerY, w: 0.05, h: 0.42, fill: { color: theme.mutedText } });
+    slide.addText(insight, { x: x + 0.2, y: footerY, w: w - 0.36, h: 0.42, fontSize: 8.5, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", valign: "middle", margin: 0 });
+  }
 }
 ```
 
@@ -705,6 +759,108 @@ slide.addText("数据截止：2025 年 Q1  ·  产品数据团队", {
 });
 ```
 
+### Cover 精装版（推荐默认使用）
+
+**`createRichCover` — 数据分析封面精装版。** 白色背景 + 左侧报告信息 + 右侧 4 个关键指标预览卡（迷你 Dashboard），让受众在封面就了解本次报告的核心数字。
+
+```javascript
+/**
+ * @param {string} title      - 报告标题（结论句，含数据）
+ * @param {string} subtitle   - 副标题（报告周期 / 数据截止日期）
+ * @param {string} owner      - 数据所有方/部门
+ * @param {string} dateStr    - 发布日期
+ * @param {Array}  kpis       - 右侧 4 个核心指标预览，每项 { value, unit, change, isPositive, label }
+ *                              例：[{ value:"87%", unit:"", change:"+5pp", isPositive:true, label:"随访完成率" }, ...]
+ */
+function createRichCover(pres, theme, title, subtitle, owner, dateStr, kpis) {
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 左侧深蓝窄色带
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 0.12, h: 5.625, fill: { color: theme.primary } });
+  // 数据蓝顶部装饰线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.05, fill: { color: theme.secondary } });
+  // 底部深蓝信息条
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 5.18, w: 10, h: 0.445, fill: { color: theme.primary } });
+
+  // 报告标签
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.35, y: 0.28, w: 1.8, h: 0.36, fill: { color: theme.light } });
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.35, y: 0.28, w: 0.05, h: 0.36, fill: { color: theme.secondary } });
+  slide.addText("数据分析报告", { x: 0.45, y: 0.28, w: 1.68, h: 0.36, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.secondary, bold: true, align: "left", valign: "middle", margin: 0 });
+
+  // 主标题
+  slide.addText(title, {
+    x: 0.35, y: 0.78, w: 5.0, h: 2.0,
+    fontSize: 30, fontFace: "Microsoft YaHei",
+    color: theme.primary, bold: true,
+    align: "left", valign: "top", margin: 0, lineSpaceMult: 1.3
+  });
+  // 数据蓝强调线
+  slide.addShape(pres.shapes.RECTANGLE, { x: 0.35, y: 2.9, w: 2.4, h: 0.05, fill: { color: theme.secondary } });
+
+  // 副标题
+  if (subtitle) {
+    slide.addText(subtitle, { x: 0.35, y: 3.02, w: 5.0, h: 0.42, fontSize: 14, fontFace: "Microsoft YaHei", color: theme.bodyText, align: "left", margin: 0 });
+  }
+  // 部门
+  if (owner) {
+    slide.addText(owner, { x: 0.35, y: 3.52, w: 5.0, h: 0.32, fontSize: 12, fontFace: "Microsoft YaHei", color: theme.mutedText, align: "left", margin: 0 });
+  }
+  // 日期（底部信息条）
+  slide.addText(dateStr || "", { x: 0.35, y: 5.18, w: 5.0, h: 0.445, fontSize: 11, fontFace: "Microsoft YaHei", color: "FFFFFF", align: "left", valign: "middle", margin: 0 });
+
+  // ── 右侧：4 个 KPI 预览卡（2×2 布局）─────────────────────
+  const cols = [5.6, 7.65];
+  const rows = [0.28, 2.66];
+  const cw = 1.9, ch = 2.22;
+
+  (kpis || []).slice(0, 4).forEach((k, i) => {
+    const cx = cols[i % 2];
+    const cy = rows[Math.floor(i / 2)];
+    const changeColor = k.isPositive ? theme.positive : theme.accent;
+
+    slide.addShape(pres.shapes.RECTANGLE, { x: cx, y: cy, w: cw, h: ch, fill: { color: theme.light }, line: { color: theme.border, width: 0.4 } });
+    slide.addShape(pres.shapes.RECTANGLE, { x: cx, y: cy, w: cw, h: 0.05, fill: { color: theme.secondary } });
+
+    // 数值
+    slide.addText(k.value, {
+      x: cx + 0.08, y: cy + 0.1, w: cw - 0.16, h: 1.0,
+      fontSize: 34, fontFace: "Arial Black",
+      color: theme.secondary, bold: true,
+      align: "center", valign: "middle", margin: 0
+    });
+    // 单位
+    if (k.unit) {
+      slide.addText(k.unit, { x: cx + cw * 0.56, y: cy + 0.14, w: cw * 0.4, h: 0.3, fontSize: 12, fontFace: "Arial Black", color: theme.secondary, bold: true, align: "left", margin: 0 });
+    }
+    // 变化值
+    if (k.change) {
+      slide.addText(k.change, { x: cx + 0.08, y: cy + 1.12, w: cw - 0.16, h: 0.3, fontSize: 12, fontFace: "Arial Black", color: changeColor, bold: true, align: "center", margin: 0 });
+    }
+    // 标签
+    slide.addText(k.label, { x: cx + 0.08, y: cy + 1.46, w: cw - 0.16, h: 0.66, fontSize: 10, fontFace: "Microsoft YaHei", color: theme.primary, bold: true, align: "center", valign: "middle", margin: 0, lineSpaceMult: 1.2 });
+  });
+
+  return slide;
+}
+```
+
+**调用示例：**
+```javascript
+createRichCover(pres, theme,
+  "慢病随访效率提升 35%\nQ1 数据深度分析",
+  "数据周期：2025年 Q1（1月–3月）",
+  "产品数据分析团队",
+  "2025年 04月",
+  [
+    { value: "87%",  unit: "",   change: "+5pp",  isPositive: true,  label: "随访完成率" },
+    { value: "1.18", unit: "亿", change: "+12%",  isPositive: true,  label: "覆盖患者规模" },
+    { value: "62%",  unit: "",   change: "-8pp",  isPositive: false, label: "断访率" },
+    { value: "4.2",  unit: "分", change: "+0.3",  isPositive: true,  label: "平均服务评分" },
+  ]
+);
+```
+
 ### TOC（目录）
 
 ```javascript
@@ -925,7 +1081,8 @@ function createDataSummarySlide(pres, theme, findings, action, source, slideNum)
 | 多指标趋势对比 | `createFullDataChartSlide`（LINE，多系列） | 正向系列用 `positive`，负向用 `accent` |
 | 柱状对比 + 文字洞察 | `createDataChartSlide`（BAR） | 差异列用 `accent` 标注 |
 | 构成 / 占比分析 | `createFullDataChartSlide`（PIE 或 DOUGHNUT） | 主占比 `secondary`，警示项 `accent` |
-| 核心 KPI 汇总 | 横排 `addKPIChangeCard`（3–5 个） | 正向 `positive`，负向 `accent` |
+| **核心 KPI + 分析要点（精装）** | **`addDataRichCard`**（tagline + findings + 底部洞察） | 顶线 `secondary`，变化色 `positive`/`accent` |
+| 核心 KPI 汇总（降级） | 横排 `addKPIChangeCard`（3–5 个） | 正向 `positive`，负向 `accent` |
 | KPI + 走势趋势 | `addKPICardWithSparkline` | 正向 sparkline 绿，负向橙 |
 | 4 指标 Dashboard | `makeSmallMultiples` SVG | 各指标可指定独立颜色 |
 | 收入/成本 Bridge | `makeWaterfall` SVG（颜色已内置） | 汇总深海蓝，增 `1A7BC4`，减 `E85D04` |
