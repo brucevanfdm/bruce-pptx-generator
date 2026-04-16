@@ -5,8 +5,13 @@
 以现有演示文稿作为模板时：
 
 1. **复制并分析**：
-   ```bash
+   ```shell
+   # bash / zsh
    cp /path/to/user-provided.pptx template.pptx
+
+   # PowerShell
+   Copy-Item 'C:\path\to\user-provided.pptx' 'template.pptx'
+
    python -m markitdown template.pptx > template.md
    ```
    查阅 `template.md`，了解占位文本与幻灯片结构。
@@ -50,14 +55,18 @@
 
 8. **打包**：将 XML 目录树重新打包为 PPTX 文件。校验、修复、压缩 XML，重新编码弯引号。
 
-   始终先写入 `/tmp/`，再复制到最终路径。Python 的 `zipfile` 模块内部使用 `seek`，在某些卷挂载（如 Docker bind mount）上会失败。先写入本地临时路径可避免此问题。
+   始终先写入**当前平台的本地临时目录**，再复制到最终路径。不要把 `/tmp/` 写死到流程里；在 Windows 使用 `$env:TEMP`，在 Python 中使用 `tempfile.gettempdir()`。Python 的 `zipfile` 模块内部使用 `seek`，在某些卷挂载（如 Docker bind mount）上会失败。先写入本地临时路径可避免此问题。
 
 ## 输出结构
 
 将用户提供的文件复制到当前目录的 `template.pptx`。这样可以保留原始文件，并为后续所有操作提供统一的文件名。
 
-```bash
+```shell
+# bash / zsh
 cp /path/to/user-provided.pptx template.pptx
+
+# PowerShell
+Copy-Item 'C:\path\to\user-provided.pptx' 'template.pptx'
 ```
 
 ```text
@@ -82,9 +91,9 @@ cp /path/to/user-provided.pptx template.pptx
 
 ## 编辑内容
 
-**Subagents：** 如果可以使用，在此步骤（完成第4步之后）使用。每张幻灯片是独立的 XML 文件，因此 subagents 可以并行编辑。在给 subagents 的提示中，包含：
+**并行 agent：** 如果运行环境支持，在此步骤（完成第4步之后）使用。每张幻灯片是独立的 XML 文件，因此可以并行编辑。在给 agent 的提示中，包含：
 - 需要编辑的幻灯片文件路径
-- **"所有更改使用 Edit 工具"**
+- **"所有更改使用当前环境提供的精确编辑能力，不要依赖粗暴批量替换"**
 - 下方的格式规则和常见陷阱
 
 对每张幻灯片：
@@ -92,7 +101,7 @@ cp /path/to/user-provided.pptx template.pptx
 2. 识别所有占位内容 — 文字、图片、图表、图标、说明文字
 3. 将每处占位内容替换为最终内容
 
-**使用 Edit 工具，而非 sed 或 Python 脚本。** Edit 工具要求明确指定替换位置和内容，可靠性更高。
+**使用当前环境提供的精确编辑能力，而非 sed 或 Python 批量重写脚本。** 关键点是明确指定替换位置和内容，避免破坏命名空间、段落结构和关系文件。
 
 ## 格式规则
 
@@ -152,7 +161,7 @@ cp /path/to/user-provided.pptx template.pptx
 
 ### 弯引号
 
-Edit 工具会将弯引号转换为 ASCII 直引号。**添加含引号的新文字时，使用 XML 实体：**
+部分精确编辑工具会将弯引号转换为 ASCII 直引号。**添加含引号的新文字时，使用 XML 实体：**
 
 ```xml
 <a:t>the &#x201C;Agreement&#x201D;</a:t>

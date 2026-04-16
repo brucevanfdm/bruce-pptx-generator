@@ -16,10 +16,10 @@
 
 **如果用户已明确指定风格** → 直接加载对应 preset 文件，跳到第 4 步。
 
-**如果用户没有指定风格** → 用 `AskUserQuestion` 问受众感受，一次提问包含所有信息。**华为方案**是默认推荐选项，在选项描述中已标注"（默认）"：
+**如果用户没有指定风格** → 优先使用结构化提问工具，一次性收集受众感受和内容深度；如果运行环境没有该工具，就直接在对话里一次性提问。**华为方案**是默认推荐选项，在选项描述中已标注"（默认）"：
 
 ```
-在一次 AskUserQuestion 调用中提问所有问题：
+在一次结构化提问中收集所有问题；若没有结构化提问工具，就把下面两题合并成一条消息发送给用户：
 
 问题 1（标题："演讲氛围"）：
   受众看完这份演示的感受是什么？
@@ -105,7 +105,7 @@
 大纲中每个 `⚠️` 项，**必须通过以下一种方式解决后才能推进**：
 
 **方式 A — 追问用户**（推荐，适合 1–3 个数据缺口）
-用 `AskUserQuestion` 一次性提问所有缺失数据点，说明每个数字用在哪张幻灯片。
+优先使用结构化提问工具；若不可用，就在一条消息里一次性提问所有缺失数据点，并说明每个数字用在哪张幻灯片。
 
 **方式 B — 行业基准估算**（缺口较多或用户授权时）
 使用典型行业基准值，并在幻灯片底部注明「参考行业基准，请替换为实际数据」，同时在回复中告知用户哪些是估算。
@@ -199,7 +199,7 @@ async function iconToBase64Png(IconComponent, color, size = 256) {
 module.exports = { iconToBase64Png };
 ```
 
-安装依赖（全局，只需执行一次）：
+安装依赖前先确认是否已可用；缺失时再安装：
 ```shell
 npm install -g react-icons react react-dom sharp
 ```
@@ -234,7 +234,7 @@ npm install -g react-icons react react-dom sharp
 
 ### subagents 并行化
 
-使用 subagents 并行生成最多 5 张幻灯片。告知每个 subagent：
+如果运行环境支持并行 agent / subagent，可并行生成最多 5 张幻灯片；如果不支持，就顺序生成，但仍保持每张幻灯片的设计合同清晰独立。告知每个 agent：
 
 1. 文件路径：`slides/slide-01.js`、`slides/slide-02.js` 等
 2. 图片目录：`slides/imgs/`
@@ -352,6 +352,13 @@ console.log('Done → slides/output/presentation.pptx');
 
 ```shell
 cd slides && node compile.js
+```
+
+PowerShell 等价写法：
+
+```powershell
+Set-Location slides
+node .\compile.js
 ```
 
 ## 第 7 步：质量检查（必须完成）

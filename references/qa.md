@@ -220,7 +220,7 @@ slide-07.js: title y:0.30 but others are y:0.22 → TITLE DRIFT
 
 前提：确认已安装 markitdown（`pip install markitdown`）。若未安装，退而用 PowerPoint 手动逐页核对内容。
 
-```bash
+```shell
 python -m markitdown output.pptx
 ```
 
@@ -228,8 +228,12 @@ python -m markitdown output.pptx
 
 ### 占位符残留检查
 
-```bash
+```shell
+# bash / zsh
 python -m markitdown output.pptx | grep -iE "xxxx|lorem|ipsum|placeholder|TODO"
+
+# PowerShell
+python -m markitdown output.pptx | Select-String -Pattern "xxxx|lorem|ipsum|placeholder|TODO" -CaseSensitive:$false
 ```
 
 如果有返回结果，修复后才能宣告完成。

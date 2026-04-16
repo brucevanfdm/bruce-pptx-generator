@@ -1,17 +1,35 @@
 ---
 name: bruce-pptx-generator
-description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Also trigger on Chinese equivalents: 幻灯片、演示、演示文稿、汇报、提案、方案、路演、deck。Always invoke this skill before generating any slide code or touching any .pptx file."
+description: "Use this skill when the user explicitly wants to create, generate, export, compile, edit, revise, or restructure a PowerPoint / PPT / PPTX / slide deck artifact. Trigger when the request clearly targets slides, a deck, or a .ppt/.pptx file as the output or editing target, including Chinese equivalents such as 幻灯片、演示文稿、PPT、PPTX、路演 deck. Do not trigger for generic proposal writing, solution discussion, presentation speaking notes, or status-update wording unless the user is explicitly asking for slide files or deck generation."
 ---
 # Bruce 的 PPTX 生成器
 
 ## 任务路由
 
-根据任务类型选择正确的路径，然后加载对应文件。
+先判断用户要的到底是**生成新 deck**还是**编辑现有 deck**。两条路径的约束不同，不可混用。
+
+### 路由原则
+
+- **生成路径**：用户明确要从零创建、生成、导出、编译新的 PPT / PPTX / slide deck。
+- **编辑路径**：用户已经提供或明确指定现有 `.ppt` / `.pptx` 文件，目标是替换内容、重排结构、删改页面或保留模板风格做更新。
+- **不要误触发**：如果用户只是写提案、整理汇报思路、润色演讲稿、讨论 presentation 内容，但没有要求生成或编辑幻灯片文件，不使用本 skill。
 
 | 任务                               | 加载文件                                                                                                      |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | **编辑**现有模板 PPTX        | [editing.md](references/editing.md) + [pptxgenjs.md](references/pptxgenjs.md)                                       |
 | **从零创建**（使用风格预设） | [workflow.md](references/workflow.md) + 预设文件 + [pptxgenjs.md](references/pptxgenjs.md) + [qa.md](references/qa.md) |
+
+### 路由隔离
+
+- **仅在生成路径**下使用 `createSlide()`、`compile.js`、`theme` 五键约定、页码徽章、Rich Card 组件和封面/目录/章节分隔页规则。
+- **编辑路径**默认保留模板结构和视觉语言，除非用户明确要求“整套重建为代码生成版”，否则不要把生成路径的组件规范硬套到 XML 编辑任务上。
+- **编辑路径**的首要目标是模板兼容、最小必要改动和重新打包后的文件可打开；**生成路径**的首要目标是新 deck 的叙事、布局和一致性。
+
+## 执行环境与回退
+
+- 优先使用运行环境里可用的**结构化提问工具**来一次性收集风格或缺失数据；如果没有该工具，就直接在对话里一次性提问全部必要信息。
+- 优先使用运行环境里可用的**精确编辑工具**修改 XML 或代码；如果没有同名工具，使用当前平台提供的等价精确编辑能力。避免依赖批量替换脚本。
+- 文中的命令以流程说明为主，按当前 shell 选择等价写法。Windows PowerShell、bash、zsh 可使用各自原生命令，只要行为一致即可。
 
 ## 风格预设
 
@@ -19,7 +37,7 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 ### 风格选择
 
-**如果用户没有指定风格**，用 `AskUserQuestion` 询问受众感受（见 workflow.md §2），默认推荐选项为**华为方案（专业权威）**。
+**如果用户没有指定风格**，优先用结构化提问工具询问受众感受（见 workflow.md §2）；如果没有该工具，就直接在对话中一次性提问。默认推荐选项为**华为方案（专业权威）**。
 
 | Preset       | 受众感受 | 字体                | 文件                                                     | 适用场景                                   |
 | ------------ | -------- | ------------------- | -------------------------------------------------------- | ------------------------------------------ |
@@ -36,7 +54,7 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 **演示文稿中禁止出现模糊表述。** 每个论点必须有具体数字支撑。当用户输入缺乏数据时：
 
-1. **优先追问**：输入中有 1–3 个数据缺口时，用 `AskUserQuestion` 一次性追问所有缺失数字，说明每个数字用在哪张幻灯片。
+1. **优先追问**：输入中有 1–3 个数据缺口时，优先使用结构化提问工具；若不可用，就在一次消息中追问所有缺失数字，并说明每个数字用在哪张幻灯片。
 2. **允许估算**：缺口较多或用户明确说"直接生成"时，使用行业典型基准值，并在幻灯片底部注明「参考行业基准，请替换为实际数据」，且须在回复中告知用户哪些是估算。
 3. **严禁空占位**：禁止写"XX%"、"N 个"、"数十万用户"而不填具体数字。
 
@@ -78,7 +96,7 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 ## 强制规则
 
-以下规则适用于每份演示文稿的每一张幻灯片。
+以下规则**仅适用于从零代码生成路径**，以及用户明确要求按 PptxGenJS 重新生成幻灯片的任务。编辑现有模板时，以模板兼容性、内容适配和最小必要结构改动为准。
 
 **尺寸** — 10" × 5.625"（LAYOUT_16x9）。每个元素必须满足 `x + w ≤ 10` 且 `y + h ≤ 5.625`。
 
@@ -88,7 +106,7 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 **禁用字体** — 以下字体禁止用作展示/标题字体：`宋体`、`仿宋`、`Times New Roman`。在现代演示文稿中会显得业余。
 
-**theme 对象** — 两层约定，必须区分清楚：
+**theme 对象** — 仅在生成路径中使用，两层约定必须区分清楚：
 
 **① compile.js / subagent 传入层（严格 5 个键）**
 
@@ -106,9 +124,9 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 各预设文件（`huawei-style.md` 等）中的组件函数（`addHuaweiRichCard`、`makePainPointCard` 等）可以引用预设文件中定义的扩展 key，如 `theme.border`、`theme.bodyText`、`theme.mutedText`、`theme.orangeLight` 等。这些 key 在预设文件的 `theme` const 块中均有定义，不属于违规。
 
-**页码徽章** — 除封面外每张幻灯片都必须有。只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式。具体坐标和形状以当前预设文件中的 `addPageBadge` 实现为准（qa.md §6 有各预设的参考值）。
+**页码徽章** — 仅适用于生成路径。除封面外每张幻灯片都必须有。只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式。具体坐标和形状以当前预设文件中的 `addPageBadge` 实现为准（qa.md §6 有各预设的参考值）。
 
-**`createSlide()` 必须是同步函数** — 禁止使用 `async`。compile.js 不会 await 它。
+**`createSlide()` 必须是同步函数** — 仅适用于生成路径，禁止使用 `async`。compile.js 不会 await 它。
 
 ## 禁止事项（常见 AI 生成质量陷阱）
 
@@ -135,13 +153,15 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 ## 依赖安装
 
-**必须安装（每次生成都需要）：**
+先检查依赖是否已可用；**缺失时再安装**。不要默认每次都重复安装。
+
+**必需依赖（生成或编译前确保可用）：**
 
 ```shell
 npm install -g pptxgenjs
 ```
 
-**按需安装（仅在使用对应功能时）：**
+**按需依赖（仅在使用对应功能时）：**
 
 ```shell
 # 使用 react-icons 图标时（workflow.md 步骤 4.8）
