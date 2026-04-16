@@ -128,7 +128,7 @@ function addHuaweiSlideTitle(slide, pres, theme, title, moduleTag, source) {
   // 来源注释（可选，左下角小灰字）
   if (source) {
     slide.addText(`来源：${source}`, {
-      x: 0.4, y: 5.3, w: 6, h: 0.25,
+      x: 0.4, y: 5.05, w: 6, h: 0.2,
       fontSize: 9, fontFace: "Microsoft YaHei",
       color: theme.mutedText, align: "left", margin: 0
     });
@@ -248,8 +248,11 @@ function addHuaweiRichCard(slide, pres, theme, x, y, w, h, num, title, tagline, 
   // Bullet 功能列表（带小方块前缀）
   const featStartY = y + 0.92;
   const featH = h < 2.0 ? 0.36 : 0.42;
+  // 最多显示条数：保留底部说明区(0.58")后，计算可容纳行数，最多5条
+  const footerReserve = detail ? 0.68 : 0.1;
+  const maxFeats = Math.min(5, Math.floor((h - 0.92 - footerReserve) / featH));
 
-  features.forEach((f, i) => {
+  features.slice(0, maxFeats).forEach((f, i) => {
     const fy = featStartY + i * featH;
     slide.addShape(pres.shapes.RECTANGLE, { x: x + 0.18, y: fy + 0.12, w: 0.12, h: 0.12, fill: { color: borderColor } });
     slide.addText(f, {
@@ -279,7 +282,8 @@ function addHuaweiRichCard(slide, pres, theme, x, y, w, h, num, title, tagline, 
 
 ```javascript
 function svgToBase64(svgStr) {
-  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+  // 统一使用 data: 前缀格式，与 addImage({ data: ... }) 兼容
+  return "data:image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
 }
 
 function makePainPointCard(slide, pres, theme, x, y, w, h, num, title, subtitle, desc, impact, iconSvg) {
@@ -574,7 +578,8 @@ function createChartWithInsightsSlide(pres, theme, title, moduleTag, chartData, 
 
 ```javascript
 function svgToBase64(svgStr) {
-  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+  // 统一使用 data: 前缀格式，与 addImage({ data: ... }) 兼容
+  return "data:image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
 }
 ```
 
@@ -847,15 +852,17 @@ function addHuaweiComparisonGrid(slide, pres, theme, x, y, w, h, options, featur
       fill: { color: isRecommend ? theme.accent : theme.secondary }
     });
     if (isRecommend) {
-      // 推荐标签
+      // 推荐标签：叠加在表头左上角（白色文字，不超出表头边界）
       slide.addText("★ 推荐", {
-        x: cx, y: y - 0.22, w: optColW, h: 0.22,
-        fontSize: 9, fontFace: "Microsoft YaHei",
-        color: theme.accent, bold: true, align: "center", margin: 0
+        x: cx, y: y, w: optColW * 0.55, h: headerH * 0.42,
+        fontSize: 8, fontFace: "Microsoft YaHei",
+        color: "FFFFFF", bold: true, align: "left",
+        margin: [0, 0, 0, 4]
       });
     }
     slide.addText(opt, {
-      x: cx + 0.05, y, w: optColW - 0.1, h: headerH,
+      x: cx + 0.05, y: isRecommend ? y + headerH * 0.35 : y,
+      w: optColW - 0.1, h: isRecommend ? headerH * 0.65 : headerH,
       fontSize: 11, fontFace: "Microsoft YaHei", color: theme.headerText,
       bold: true, align: "center", valign: "middle", margin: 0
     });

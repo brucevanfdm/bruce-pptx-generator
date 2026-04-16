@@ -66,14 +66,15 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 | 风格 | 封面精装 | 内容精装组件 | 禁用的毛坯组件 |
 |------|---------|-------------|----------------|
-| 华为方案 | `createRichCover` | `addHuaweiRichCard`、`makePainPointCard`、`addHuaweiProcessFlow` | `addHuaweiNumberedCard(title, desc)` |
-| 麦肯锡蓝 | `createRichCover` | `addMcKinseyRichCard`、`addIconKpiCard` | `addMcKinseyCard(value, label, desc)` |
+| 华为方案 | `createRichCover` | `addHuaweiRichCard`、`makePainPointCard`、`addHuaweiProcessFlow` | `addHuaweiNumberedCard` 的基础用法（仅传 title+desc，无 tagline/bullet/底部说明） |
+| 麦肯锡蓝 | `createRichCover` | `addMcKinseyRichCard`、`makeProgressRing` + KPI 卡 | `addMcKinseyCard(value, label, desc)` |
 | 苹果极简 | `createRichCover` | `addAppleRichCard`、`addAppleKPI` | `addAppleBullets` 单独使用 |
 | Pitch Deck | `createRichCover` | `addPitchRichCard`、`addTractionCard` | 纯文字列表页 |
 | 暗黑科技 | `createRichCover` | `addDarkRichCard`、`addFeatureItem` | 仅有标题+正文段落 |
 | 数据分析 | `createRichCover` | `addDataRichCard`、`createChartWithInsightsSlide` | 纯文字分析页 |
 
 - 封面页必须有装饰性视觉元素（几何图形、SVG 装饰、右侧能力卡片等），禁止只有标题和日期。
+- **注意**：`createRichCover` 在各风格中参数签名不同（华为版有 `metrics`/`valueSlogan`，苹果版有 `spotlight`，Pitch Deck 版有 `traction`/`stage`），使用前必须查阅当前预设文件的调用示例，不可跨风格套用参数。
 
 ## 强制规则
 
@@ -134,7 +135,7 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 - 标题照抄正文第一句 — 标题应该是结论或主旨，不是描述
 - 英文 text 混用宋体/仿宋 — 英文必须用指定英文字体
-- `#` 前缀颜色值（`"#1A3C6E"` → 改为 `"1A3C6E"`）— 会导致文件损坏
+- `#` 前缀颜色值（`"#1F3864"` → 改为 `"1F3864"`）— 会导致文件损坏
 
 ## 依赖安装
 

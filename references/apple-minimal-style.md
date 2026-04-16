@@ -400,6 +400,76 @@ createRichCover(pres, theme, "人人都能用的 AI", "产品路线图 2025", "A
 
 极简列表，数字 + 标题，不加任何边框或底色。
 
+```javascript
+function createAppleTOCSlide(pres, theme, items, slideNum) {
+  // items: [{ num, title, subtitle? }]，最多 6 条
+  const slide = pres.addSlide();
+  slide.background = { color: theme.bg };
+
+  // 页面标题
+  slide.addText("目录", {
+    x: 0.6, y: 0.3, w: 8.8, h: 0.55,
+    fontSize: 13, fontFace: "Microsoft YaHei",
+    color: theme.muted, align: "left", valign: "middle", margin: 0
+  });
+  // 细分隔线
+  slide.addShape(pres.shapes.RECTANGLE, {
+    x: 0.6, y: 0.9, w: 8.8, h: 0.01,
+    fill: { color: theme.border }
+  });
+
+  const n = Math.min(items.length, 6);
+  const rowH = (5.0 - 1.05) / n;  // 均分内容区
+
+  items.slice(0, n).forEach((item, i) => {
+    const ry = 1.05 + i * rowH;
+    const isLast = i === n - 1;
+
+    // 序号（蓝色，Arial Black）
+    slide.addText(String(item.num).padStart(2, "0"), {
+      x: 0.6, y: ry, w: 0.9, h: rowH,
+      fontSize: 22, fontFace: "Arial Black",
+      color: theme.secondary, bold: true,
+      align: "left", valign: "middle", margin: 0
+    });
+    // 标题
+    slide.addText(item.title, {
+      x: 1.6, y: ry, w: 7.8, h: item.subtitle ? rowH * 0.55 : rowH,
+      fontSize: 15, fontFace: "Microsoft YaHei",
+      color: theme.primary, bold: true,
+      align: "left", valign: item.subtitle ? "bottom" : "middle", margin: 0
+    });
+    // 副标题（可选）
+    if (item.subtitle) {
+      slide.addText(item.subtitle, {
+        x: 1.6, y: ry + rowH * 0.55, w: 7.8, h: rowH * 0.38,
+        fontSize: 11, fontFace: "Microsoft YaHei",
+        color: theme.muted, align: "left", valign: "top", margin: 0
+      });
+    }
+    // 条目底部分隔线（最后一条不加）
+    if (!isLast) {
+      slide.addShape(pres.shapes.RECTANGLE, {
+        x: 1.6, y: ry + rowH - 0.01, w: 7.8, h: 0.01,
+        fill: { color: theme.border }
+      });
+    }
+  });
+
+  addPageBadge(slide, pres, theme, slideNum);
+  return slide;
+}
+
+// 用法（5 章节）：
+// createAppleTOCSlide(pres, theme, [
+//   { num: 1, title: "背景与挑战",   subtitle: "市场变化与核心痛点" },
+//   { num: 2, title: "解决方案",     subtitle: "产品核心能力全景" },
+//   { num: 3, title: "实施路径",     subtitle: "三阶段落地方案" },
+//   { num: 4, title: "成效与案例",   subtitle: "客户验证数据" },
+//   { num: 5, title: "下一步",       subtitle: "行动建议与资源投入" },
+// ], 2);
+```
+
 ### Section Divider（章节分隔）
 
 使用 `createSectionDividerSlide`，浅灰背景 + 大标题，或使用 `createBlackStatementSlide` 做暗色强转场。

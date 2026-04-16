@@ -105,7 +105,7 @@ function addDataSlideTitle(slide, pres, theme, title, source) {
   // 来源注释（左下角）
   if (source) {
     slide.addText(`数据来源：${source}`, {
-      x: 0.4, y: 5.32, w: 6.0, h: 0.22,
+      x: 0.4, y: 5.05, w: 6.0, h: 0.2,
       fontSize: 9, fontFace: "Microsoft YaHei",
       color: theme.mutedText, align: "left", margin: 0
     });
@@ -449,7 +449,8 @@ function createFullDataChartSlide(pres, theme, title, chartData, chartType, sour
 ```javascript
 // SVG 字符串转 base64 Data URI（Node.js 同步，零依赖）
 function svgToBase64(svgStr) {
-  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+  // 统一使用 data: 前缀格式，与 addImage({ data: ... }) 兼容
+  return "data:image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
 }
 ```
 
@@ -1048,7 +1049,7 @@ function createDataSummarySlide(pres, theme, findings, action, source, slideNum)
   // 来源注释（左下角，mutedText）
   if (source) {
     slide.addText(`数据来源：${source}`, {
-      x: 0.4, y: 5.32, w: 6.0, h: 0.22,
+      x: 0.4, y: 5.05, w: 6.0, h: 0.2,
       fontSize: 9, fontFace: "Microsoft YaHei",
       color: theme.mutedText, align: "left", margin: 0
     });

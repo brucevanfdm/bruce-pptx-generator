@@ -193,12 +193,14 @@ function createSectionDividerSlide(pres, theme, num, title, subtitle, slideNum) 
     color: theme.bg, bold: true, align: "center", valign: "middle", margin: 0
   });
 
-  // 副标题
-  slide.addText(subtitle, {
-    x: 3.0, y: 2.78, w: 4.2, h: 0.38,
-    fontSize: 13, fontFace: "Microsoft YaHei",
-    color: theme.mutedText, align: "center", margin: 0
-  });
+  // 副标题（可选）
+  if (subtitle) {
+    slide.addText(subtitle, {
+      x: 3.0, y: 2.78, w: 4.2, h: 0.38,
+      fontSize: 13, fontFace: "Microsoft YaHei",
+      color: theme.mutedText, align: "center", margin: 0
+    });
+  }
 
   addPageBadge(slide, pres, theme, slideNum);
   return slide;
@@ -292,8 +294,8 @@ function addKPICard(slide, pres, theme, x, y, w, h, value, unit, label, color) {
   });
   if (unit) {
     slide.addText(unit, {
-      x: x, y: y + 0.9, w: w, h: 0.38,
-      fontSize: 16, fontFace: "Microsoft YaHei",
+      x: x, y: y + 1.15, w: w, h: 0.3,
+      fontSize: 14, fontFace: "Microsoft YaHei",
       color: color || theme.secondary, bold: true,
       align: "center", margin: 0
     });
@@ -440,7 +442,8 @@ createFullDarkChartSlide(pres, theme, "平台月活用户连续 8 个月超预�
 ```javascript
 // SVG 转 base64 工具函数
 function svgToBase64(svgStr) {
-  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+  // 统一使用 data: 前缀格式，与 addImage({ data: ... }) 兼容
+  return "data:image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
 }
 ```
 

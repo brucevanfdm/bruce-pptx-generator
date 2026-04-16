@@ -106,7 +106,7 @@ function addMcKinseySlideTitle(slide, pres, theme, title, source) {
   // 来源注释（可选，左下角小灰字）
   if (source) {
     slide.addText(`来源：${source}`, {
-      x: 0.4, y: 5.3, w: 6, h: 0.25,
+      x: 0.4, y: 5.05, w: 6, h: 0.2,
       fontSize: 9, fontFace: "Microsoft YaHei",
       color: theme.mutedText, align: "left", margin: 0
     });
@@ -322,12 +322,14 @@ function createSectionDividerSlide(pres, theme, num, title, subtitle, slideNum) 
     color: "FFFFFF", bold: true,
     align: "left", valign: "middle", margin: 0
   });
-  // 副标题
-  slide.addText(subtitle, {
-    x: 0.8, y: 3.55, w: 8.0, h: 0.4,
-    fontSize: 14, fontFace: "Microsoft YaHei",
-    color: theme.light, align: "left", margin: 0
-  });
+  // 副标题（可选）
+  if (subtitle) {
+    slide.addText(subtitle, {
+      x: 0.8, y: 3.55, w: 8.0, h: 0.4,
+      fontSize: 14, fontFace: "Microsoft YaHei",
+      color: theme.light, align: "left", margin: 0
+    });
+  }
 
   addPageBadge(slide, pres, theme, slideNum);
   return slide;
@@ -559,7 +561,8 @@ function addIconKpiCard(slide, pres, theme, x, y, w, h, iconData, value, label, 
 
 ```javascript
 function svgToBase64(svgStr) {
-  return "image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
+  // 统一使用 data: 前缀格式，与 addImage({ data: ... }) 兼容
+  return "data:image/svg+xml;base64," + Buffer.from(svgStr).toString("base64");
 }
 ```
 

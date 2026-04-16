@@ -190,7 +190,7 @@ const { iconToBase64Png } = require("./icon-utils");
 const { FaCheckCircle } = require("react-icons/fa");
 
 // 在创建幻灯片之前预先生成
-const checkIcon = await iconToBase64Png(FaCheckCircle, "#4472C4", 256);
+const checkIcon = await iconToBase64Png(FaCheckCircle, "#4472C4", 256); // react-icons 接受 CSS 颜色格式（含 #），这是唯一允许使用 # 前缀的地方；addShape/addText 颜色仍禁止 #
 
 // 作为额外参数传入
 const slideModule = require("./slide-03.js");

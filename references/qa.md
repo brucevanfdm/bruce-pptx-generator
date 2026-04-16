@@ -152,7 +152,12 @@ const backgrounds = {
 除封面外，每张幻灯片都必须有页码标记。检查：
 - 标记是否存在
 - 标记显示的编号是否按顺序正确
-- 位置：`x:9.3, y:5.1, w:0.4, h:0.4`（圆形）或 `x:9.1, y:5.15, w:0.6, h:0.35`（胶囊形）
+- 位置：**以当前预设文件中 `addPageBadge` 的实际坐标为准**（各预设实现略有差异）。SKILL.md 中列出的是参考规格，不作为 QA 判断依据。
+  - 华为 / Pitch Deck：`x:9.1, y:5.15, w:0.6, h:0.35`（胶囊形）
+  - Dark Tech：`x:9.3, y:5.1, w:0.4, h:0.4`（圆形）
+  - McKinsey：`x:9.2, y:5.1, w:0.55, h:0.35`
+  - 数据分析：`x:9.3, y:5.2, w:0.4, h:0.28`
+  - 苹果极简：见预设文件
 
 ### 7. 标题结构
 
@@ -212,6 +217,8 @@ slide-07.js: title y:0.30 but others are y:0.22 → TITLE DRIFT
 第一次渲染几乎不会完全正确。将 QA 作为 bug 排查过程来对待，而非确认步骤。
 
 ### 内容提取
+
+前提：确认已安装 markitdown（`pip install markitdown`）。若未安装，退而用 PowerPoint 手动逐页核对内容。
 
 ```bash
 python -m markitdown output.pptx

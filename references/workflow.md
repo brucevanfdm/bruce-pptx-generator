@@ -25,7 +25,7 @@
   受众看完这份演示的感受是什么？
   options:
     - label: "逻辑严密"
-      description: "战略汇报、咨询报告、管理层提案 → 推荐：麦肯锡蓝（默认）"
+      description: "战略汇报、咨询报告、管理层提案 → 推荐：麦肯锡蓝"
     - label: "打动人心"
       description: "产品发布、Demo、Vision 演讲、对外路演 → 推荐：苹果极简"
     - label: "卖动"
@@ -50,7 +50,7 @@
 
 | Preset | 氛围 | 文件 |
 |--------|------|------|
-| 麦肯锡蓝（默认） | 逻辑、权威、顾问感 | [mckinsey-style.md](mckinsey-style.md) |
+| 麦肯锡蓝 | 逻辑、权威、顾问感 | [mckinsey-style.md](mckinsey-style.md) |
 | 苹果极简 | 打动人心、视觉叙事 | [apple-minimal-style.md](apple-minimal-style.md) |
 | Pitch Deck | 卖动、说服、路演 | [pitch-deck-style.md](pitch-deck-style.md) |
 | 数据分析 | 讲清、数据优先 | [data-analysis-style.md](data-analysis-style.md) |
@@ -80,9 +80,11 @@
 
 以结构化表格呈现每张幻灯片，同步暴露所有数据缺口：
 
+> **组件名称来源**：大纲表格中的组件名（`createRichCover`、`createTOCSlide`、`makePainPointCard` 等）均为当前加载的预设文件中定义的函数。**禁止自行实现**——确认预设文件已加载后再填写组件列。
+
 | # | 类型 | 标题（结论句） | 核心组件 | ⚠️ 待补充 |
 |---|------|--------------|---------|----------|
-| 01 | Cover | [演示标题] | `createRichCover`（每种风格均有实现） | — |
+| 01 | Cover | [演示标题] | `createRichCover`（签名因风格而异，见预设文件调用示例） | — |
 | 02 | TOC | 目录 | `createTOCSlide` | — |
 | 03 | Section | 一、[章节名] | `createSectionDivider` | — |
 | 04 | Content | [含具体数字的结论句] | `makePainPointCard × 3` | ⚠️ [缺失数字] |
@@ -119,7 +121,9 @@
 
 **收到用户确认后才进入第 4 步。禁止在用户未确认大纲前写任何幻灯片代码。**
 
-## 第 4 步：规划幻灯片大纲
+## 第 4 步：规划幻灯片大纲（内部实现规划，不修改第 3 步确认的内容）
+
+> **注意**：第 3 步已与用户确认了幻灯片列表和组件选择。本步骤只做实现层面的规划（函数调用细节、坐标区域划分），禁止修改幻灯片数量、顺序或标题措辞。
 
 将**每张幻灯片**精确归类为以下 5 种页面类型之一：
 
@@ -171,9 +175,9 @@
 
 进入第 5 步前修复所有不符合项。
 
-## 第 4.8 步：初始化工具文件（需要图标时）
+## 第 4.8 步：初始化工具文件（需要 react-icons 图标时）
 
-如果演示文稿中有任何 `addIconKpiCard` 调用，在开始写 slide 文件之前，先在 `slides/` 目录创建以下工具文件。只需创建一次。
+如果演示文稿中有任何通过 `iconToBase64Png` 使用 react-icons 图标的调用，在开始写 slide 文件之前，先在 `slides/` 目录创建以下工具文件。只需创建一次。
 
 ```javascript
 // slides/icon-utils.js
