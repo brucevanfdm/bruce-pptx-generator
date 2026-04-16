@@ -16,7 +16,7 @@
 
 **如果用户已明确指定风格** → 直接加载对应 preset 文件，跳到第 4 步。
 
-**如果用户没有指定风格** → 用 `AskUserQuestion` 问受众感受，一次提问包含所有信息：
+**如果用户没有指定风格** → 用 `AskUserQuestion` 问受众感受，一次提问包含所有信息。**华为方案**是默认推荐选项，在选项描述中已标注"（默认）"：
 
 ```
 在一次 AskUserQuestion 调用中提问所有问题：
@@ -24,6 +24,8 @@
 问题 1（标题："演讲氛围"）：
   受众看完这份演示的感受是什么？
   options:
+    - label: "专业权威"
+      description: "产品介绍、公司介绍、解决方案、政企客户提案 → 推荐：华为方案（默认）"
     - label: "逻辑严密"
       description: "战略汇报、咨询报告、管理层提案 → 推荐：麦肯锡蓝"
     - label: "打动人心"
@@ -50,6 +52,7 @@
 
 | Preset | 氛围 | 文件 |
 |--------|------|------|
+| 华为方案（默认） | 专业权威、解决方案感 | [huawei-style.md](huawei-style.md) |
 | 麦肯锡蓝 | 逻辑、权威、顾问感 | [mckinsey-style.md](mckinsey-style.md) |
 | 苹果极简 | 打动人心、视觉叙事 | [apple-minimal-style.md](apple-minimal-style.md) |
 | Pitch Deck | 卖动、说服、路演 | [pitch-deck-style.md](pitch-deck-style.md) |
@@ -306,7 +309,9 @@ module.exports = { createSlide };
 
 ## 第 6 步：编译为最终 PPTX
 
-创建 `slides/compile.js`：
+创建 `slides/compile.js`。
+
+> **如果演示文稿使用了 react-icons 图标**（步骤 4.8 中初始化了 `icon-utils.js`），整个 compile.js 文件必须包裹在 `(async () => { ... })()` 中，因为 `iconToBase64Png` 是异步函数。下方模板为不使用图标的同步版本；使用图标时参考步骤 4.8 的说明进行改写。
 
 ```javascript
 // slides/compile.js

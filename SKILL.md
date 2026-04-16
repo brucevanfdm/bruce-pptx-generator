@@ -1,6 +1,6 @@
 ---
 name: bruce-pptx-generator
-description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Always invoke this skill before generating any slide code or touching any .pptx file."
+description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, presentation, slides, or a deck — even casually. Also trigger on Chinese equivalents: 幻灯片、演示、演示文稿、汇报、提案、方案、路演、deck。Always invoke this skill before generating any slide code or touching any .pptx file."
 ---
 # Bruce 的 PPTX 生成器
 
@@ -19,7 +19,7 @@ description: "Use this skill whenever the user mentions PPT, PPTX, PowerPoint, p
 
 ### 风格选择
 
-**如果用户没有指定风格**，默认推荐**华为方案**。如需确认，可用 `AskUserQuestion` 问：受众看完这份演示的感受是什么？
+**如果用户没有指定风格**，用 `AskUserQuestion` 询问受众感受（见 workflow.md §2），默认推荐选项为**华为方案（专业权威）**。
 
 | Preset       | 受众感受 | 字体                | 文件                                                     | 适用场景                                   |
 | ------------ | -------- | ------------------- | -------------------------------------------------------- | ------------------------------------------ |
@@ -106,11 +106,7 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 各预设文件（`huawei-style.md` 等）中的组件函数（`addHuaweiRichCard`、`makePainPointCard` 等）可以引用预设文件中定义的扩展 key，如 `theme.border`、`theme.bodyText`、`theme.mutedText`、`theme.orangeLight` 等。这些 key 在预设文件的 `theme` const 块中均有定义，不属于违规。
 
-**页码徽章** — 除封面外每张幻灯片都必须有：
-
-- 圆形：`x: 9.3, y: 5.1, w: 0.4, h: 0.4`
-- 胶囊形：`x: 9.1, y: 5.15, w: 0.6, h: 0.35`
-- 只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式
+**页码徽章** — 除封面外每张幻灯片都必须有。只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式。具体坐标和形状以当前预设文件中的 `addPageBadge` 实现为准（qa.md §6 有各预设的参考值）。
 
 **`createSlide()` 必须是同步函数** — 禁止使用 `async`。compile.js 不会 await 它。
 
@@ -139,6 +135,18 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 ## 依赖安装
 
+**必须安装（每次生成都需要）：**
+
 ```shell
 npm install -g pptxgenjs
+```
+
+**按需安装（仅在使用对应功能时）：**
+
+```shell
+# 使用 react-icons 图标时（workflow.md 步骤 4.8）
+npm install -g react-icons react react-dom sharp
+
+# 编译后内容提取与 QA 验证时（qa.md 编译后 QA 章节）
+pip install markitdown
 ```
