@@ -11,6 +11,44 @@
 2. **金字塔原则（Pyramid Principle）** — 先结论后支撑。封面页即传递核心观点，后续页面逐层展开证据。
 3. **MECE** — 每张内容页的要点必须互相独立、合计完整（Mutually Exclusive, Collectively Exhaustive）。
 
+## 默认叙事骨架
+
+麦肯锡蓝默认按“结论驱动的决策汇报”展开：
+
+1. Executive Summary：先给 1 页结论，不做铺垫
+2. Current State：用数据说明现状和差距
+3. Diagnosis：拆出 2–4 个问题成因或分析维度
+4. Options：列出备选方案与取舍
+5. Recommendation：给出推荐路径与理由
+6. Action Plan：明确时间、责任、资源、下一步
+
+如果 deck 不能被压缩成这 6 步中的某种变体，通常还不够“顾问式”。
+
+## 签名页
+
+这套风格的 signature pages 应优先是：
+
+- **Executive Summary Slide**：一句结论 + 三个支撑证据
+- **Issue Tree / Logic Tree**：问题分解或机会分解
+- **Bridge / Waterfall**：收入、成本、转化、效率的变化拆解
+- **Decision Table**：方案对比、取舍、推荐理由
+
+这些页面比装饰性复杂图形更能构成麦肯锡感。
+
+## 禁用模式
+
+- 禁止把 radar、venn、装饰 SVG 当成默认推荐。只有在问题本身确实需要时才使用。
+- 禁止标题只是主题词。所有内容页标题必须是结论句、建议句或判断句。
+- 禁止出现“看起来很忙但没有 so what”的图表。每页都要落到行动含义。
+- 禁止过多高亮色并存。麦肯锡风的视觉克制是可信度的一部分。
+
+## 图表与图形语法
+
+- 每张图表优先回答一个判断，而不是展示全部数据。
+- 默认采用 **BAR / LINE / Waterfall / Comparison Grid / Issue Tree** 这类利于决策的图形。
+- 图表标题用 Action Title，底部或右侧必须补 1 句 `so what`。
+- 表格优先做“决策表”和“方案对比表”；长明细不要留在主体叙事中。
+
 ## 色板
 
 | 角色 | 名称 | Hex | 用途 |

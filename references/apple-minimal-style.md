@@ -6,6 +6,44 @@
 
 **打动人心** — 极简主义不等于空洞，是把最重要的一件事放到最大、最清晰。每张幻灯片只问一个问题：这页的唯一信息是什么？
 
+## 默认叙事骨架
+
+Apple 极简不是“少放一点内容”，而是“把注意力引到唯一主张上”。默认顺序应偏向视觉叙事：
+
+1. Hero Statement：一句最重要的话
+2. Why It Matters：一个数字或一个场景，说明为什么值得在意
+3. Product / Capability Reveal：核心能力或关键变化
+4. Proof：1 个 KPI、1 张图、1 个 before/after
+5. Next Scene：黑底声明页或极简转场页
+6. Closing Line：一句让人记住的收束
+
+优先把 deck 做成“连续镜头”，而不是“连续信息块”。
+
+## 签名页
+
+这套风格的 signature pages 应优先是：
+
+- **Hero Statement Page**：一句大字主张占主视觉
+- **One Number Page**：一个数字 + 极少标签
+- **Black Statement Slide**：暗底强转场
+- **Product Image + One Sentence**：一张主视觉 + 一句解释
+
+如果 Apple 风主要由多张均匀卡片页组成，它通常已经偏离目标。
+
+## 禁用模式
+
+- 禁止把卡片当默认容器。`addAppleRichCard` 是补充手段，不是整套风格的主语法。
+- 禁止三栏卡片墙、密集 bullet、复杂矩阵默认出现。
+- 禁止频繁边框、分隔线、浅灰盒子叠满整页；留白必须是真留白。
+- 禁止一页同时有多个焦点元素。标题、数字、图像、流程只允许一个主角。
+
+## 图表与图形语法
+
+- 图表只在它比文字更有力时出现；否则优先用大字、单数字、单对比。
+- 优先使用 **single KPI / before-after / one chart + one takeaway / single timeline**。
+- Apple 风允许“只有一句话 + 留白”的内容页；不强制每页都塞满视觉组件。
+- 如果必须使用卡片，优先单卡或双卡，不默认三卡并列。
+
 ## 色板
 
 | 角色 | 名称 | Hex | 用途 |
@@ -72,8 +110,8 @@ const theme = {
 
 - 标题页 / Hero 页：仅标题 + 可选一行副标题（可加装饰性几何图形）
 - 数据页：1–3 个 KPI，配趋势箭头或变化率标签
-- **要点页：3–5 条，每条需有 tagline（10–20 字）+ 底部洞察说明**
-- **每张内容页至少包含 1 种非文字视觉**（装饰 SVG / KPI 卡 / 图表 / 图标矩阵）
+- **要点页：最多 3–4 条，每条需有 tagline（10–20 字）+ 底部洞察说明**
+- **内容页优先采用单一视觉锚点**（Hero 大字 / 单 KPI / 单图 / 单时间线）；允许只用大字 + 留白完成表达
 - 禁止任何形式的文字墙
 
 
@@ -82,16 +120,18 @@ const theme = {
 
 | 内容类型 | 推荐组件（精装优先） |
 |---------|---------|
-| **核心主张 / 要点页** | **`addAppleRichCard`**（tagline + bullet + 底部洞察） |
+| **核心主张 / 转场页** | **`addHeroStatement`** / `createBlackStatementSlide` |
 | **数据 / KPI 页** | **`addAppleKPI`** + 趋势标签 |
+| **核心主张 / 要点页** | `addAppleRichCard`（仅当需要承载结构化信息时使用） |
 | **对比 / 构成** | `addAppleChart(BAR/PIE)` |
 | **流程 / 时间线** | `makeAppleTimeline` (SVG) |
 | **层级 / 架构** | `makeAppleHierarchy` (SVG) |
 | **并列要点（降级）** | `addAppleBullets` |
 
 **强制规则：**
-- **每张 Content 页至少包含 1 种非文字视觉元素**
-- 基础 `addHeroStatement` + `addAppleBullets` 视为毛坯房组合，优先用 `addAppleRichCard` 替代
+- **每张 Content 页只能有 1 个主焦点**
+- `addAppleRichCard` 不是默认母语；Hero、单数字、单图优先
+- 基础 `addHeroStatement` + `addAppleBullets` 若没有明确视觉节奏，仍视为毛坯房
 
 ## 标志性设计元素
 

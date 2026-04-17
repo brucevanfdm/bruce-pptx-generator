@@ -84,21 +84,27 @@
 以结构化表格呈现每张幻灯片，同步暴露所有数据缺口：
 
 > **组件名称来源**：大纲表格中的组件名（`createRichCover`、`createTOCSlide`、`makePainPointCard` 等）均为当前加载的预设文件中定义的函数。**禁止自行实现**——确认预设文件已加载后再填写组件列。
+>
+> **新增要求**：大纲在确认时就要暴露 deck skeleton，包括 `Section` 和 `Master`。不要等到写代码时才临时决定骨架。
 
-| # | 类型 | 标题（结论句） | 核心组件 | ⚠️ 待补充 |
-|---|------|--------------|---------|----------|
-| 01 | Cover | [演示标题] | `createRichCover`（签名因风格而异，见预设文件调用示例） | — |
-| 02 | TOC | 目录 | `createTOCSlide` | — |
-| 03 | Section | 一、[章节名] | `createSectionDivider` | — |
-| 04 | Content | [含具体数字的结论句] | `makePainPointCard × 3` | ⚠️ [缺失数字] |
-| 05 | Content | [含具体数字的结论句] | `addHuaweiRichCard × 3` | — |
-| N | Summary | [行动号召句] | `createSummarySlide` | — |
+| # | 类型 | Section | 标题（结论句） | Master | 核心组件 | ⚠️ 待补充 |
+|---|------|---------|--------------|--------|---------|----------|
+| 01 | Cover | — | [演示标题] | `COVER_MASTER` | `createRichCover`（签名因风格而异，见预设文件调用示例） | — |
+| 02 | TOC | — | 目录 | `TOC_MASTER` | `createTOCSlide` | — |
+| 03 | Section | 市场机会 | 一、市场机会 | `SECTION_MASTER` | `createSectionDivider` | — |
+| 04 | Content | 市场机会 | [含具体数字的结论句] | `CONTENT_MASTER` | `makePainPointCard × 3` | ⚠️ [缺失数字] |
+| 05 | Content | 解决方案 | [含具体数字的结论句] | `CONTENT_MASTER` | `addHuaweiRichCard × 3` | — |
+| 10 | Appendix | 附录 | 区域医院指标明细（42 行） | `APPENDIX_MASTER` | `addTable(... autoPage)` | — |
+| N | Summary | 结论与行动 | [行动号召句] | `SUMMARY_MASTER` | `createSummarySlide` | — |
 
 **大纲表格强制规则：**
 
 - **标题列** — 必须是结论句/价值句，含具体数字优先。❌ "产品功能介绍" → ✅ "三大核心能力将交付周期压缩 40%"
+- **Section 列** — 除封面/目录外，每张 slide 都要明确归属 section；Section Divider、内容页、总结页、附录页不得留空
+- **Master 列** — 必须从 deck skeleton 的 master registry 中选择，不能写成“默认”或“到时再看”
 - **核心组件列** — 具体到函数名。❌ "卡片布局" → ✅ `addHuaweiRichCard × 3`
 - **⚠️ 待补充列** — 所有尚未获得的具体数字、比例、时间节点，全部列出
+- **附录判定** — 超出风格安全密度的长表格，必须在大纲阶段就标为 `Appendix`，不能先塞进内容页再看是否溢出
 
 ### 3.3 数据缺口处理（确认前必须解决）
 
@@ -128,7 +134,7 @@
 
 > **注意**：第 3 步已与用户确认了幻灯片列表和组件选择。本步骤只做实现层面的规划（函数调用细节、坐标区域划分），禁止修改幻灯片数量、顺序或标题措辞。
 
-将**每张幻灯片**精确归类为以下 5 种页面类型之一：
+将**每张幻灯片**精确归类为以下 6 种页面类型之一：
 
 | 类型 | 用途 |
 |------|---------|
@@ -136,9 +142,88 @@
 | TOC | 目录 — 章节概览 |
 | Section Divider | 主要章节之间的分隔页 |
 | Content | 主要内容幻灯片 — 所有变体 |
+| Appendix | 附录页 — 长表格、补充数据、明细清单 |
 | Summary | 结尾 — 关键要点、行动号召、致谢 |
 
-确保视觉多样性 — 不要在连续幻灯片中使用相同的内容布局。各类型的详细布局选项请参阅当前 preset 文件的"5 种页面类型"章节。
+确保视觉多样性 — 不要在连续幻灯片中使用相同的内容布局。封面、目录、章节分隔、内容、总结的视觉细节请参阅当前 preset 文件的"5 种页面类型"章节；`Appendix` 属于 deck skeleton 层，默认沿用表格风格组件 + `APPENDIX_MASTER`。
+
+## 第 4.1 步：先建立 deck skeleton（必须完成）
+
+在写任何 slide 文件前，先在实现层定义整份 deck 的骨架：
+
+- **master registry**：至少包含 `COVER_MASTER`、`TOC_MASTER`、`SECTION_MASTER`、`CONTENT_MASTER`、`SUMMARY_MASTER`
+- **appendix registry**：存在长表格时，再增加 `APPENDIX_MASTER`
+- **section map**：列出所有业务章节标题，确保与 TOC、章节分隔页、PPT section title 一致
+- **slide manifest**：为每个 slide 指定 `file`、`type`、`masterName`、`sectionTitle`
+
+推荐写成这样的内部清单：
+
+```javascript
+const slideManifest = [
+  { file: "slide-01.js", type: "cover", masterName: "COVER_MASTER" },
+  { file: "slide-02.js", type: "toc", masterName: "TOC_MASTER" },
+  { file: "slide-03.js", type: "section", masterName: "SECTION_MASTER", sectionTitle: "市场机会" },
+  { file: "slide-04.js", type: "content", masterName: "CONTENT_MASTER", sectionTitle: "市场机会" },
+  { file: "slide-10.js", type: "appendix", masterName: "APPENDIX_MASTER", sectionTitle: "附录" },
+];
+```
+
+## 第 4.2 步：定义 Master / Placeholder 合同
+
+生成路径的高阶能力，核心不在“每页都手画一遍”，而在“master 画重复 chrome，slide 只填内容”。因此在进入第 5 步前先定义：
+
+- 哪些固定元素进入 master：logo、页眉、页脚、页码轨道、标题底线、固定免责声明
+- 哪些内容通过 placeholder 注入：`title`、`subtitle`、`body`、`chart`、`table`、`insight`、`media`
+- 哪些内容仍用绝对坐标：非常规装饰、复杂图形、跨栏流程图、Rich Card 组合布局
+
+规则：
+
+- 相同语义槽位在不同风格中优先使用相同 placeholder 名，便于 compile.js 做统一编排
+- 不要把完全动态的复杂布局硬塞进 placeholder；placeholder 适合标题、正文、图表区、表格区等稳定区域
+- 明明可进入 master 的固定元素，不要在 slide 文件里重复绘制
+
+## 第 4.3 步：建立 Section 合同
+
+每个主要章节在编译前先注册为真实的 PPT section：
+
+```javascript
+pres.addSection({ title: "市场机会" });
+pres.addSection({ title: "解决方案" });
+pres.addSection({ title: "落地计划" });
+pres.addSection({ title: "附录" });
+```
+
+随后在创建 slide 时显式指定 `sectionTitle`：
+
+```javascript
+const slide = pres.addSlide({
+  masterName: "CONTENT_MASTER",
+  sectionTitle: "解决方案",
+});
+```
+
+约束：
+
+- 封面和 TOC 可不属于任何 section
+- Section Divider、Content、Appendix、Summary 均应属于某个 section
+- TOC 展示名称、章节分隔页标题、`pres.addSection({ title })` 的标题三者必须完全一致
+
+## 第 4.4 步：Appendix Table Auto-Paging 规划
+
+当表格满足以下任一条件时，直接规划到 appendix，而不是硬塞内容页：
+
+- 行数超过当前风格建议上限
+- 列数超过 5 且无法通过删减保留结论
+- 为塞进内容页必须把字号压到 10pt 以下
+- 表格的主要价值是“备查明细”，不是“页面主结论”
+
+Appendix 表格的实现约定：
+
+- 使用 `APPENDIX_MASTER`
+- 通过 placeholder 预留 `title`、`table`、`insight` 区
+- `slide.addTable(..., { autoPage: true, autoPageRepeatHeader: true })`
+- 多列表头时补上 `autoPageHeaderRows`
+- 第一页说明“这是什么明细表”，后续自动分页页保持相同表头和 section 归属
 
 ## 第 4.5 步：大纲审查（写代码前必须完成）
 
@@ -173,6 +258,9 @@
 - [ ] deck 有封面幻灯片
 - [ ] 超过 5 张幻灯片时：包含目录
 - [ ] 每个主要章节有章节分隔页
+- [ ] 每个主要章节已预注册为 PPT section
+- [ ] master registry 已先于 slide 文件规划完成
+- [ ] 需要长表格时：已规划 appendix slide，而非临时挤进内容页
 - [ ] deck 以总结/结尾幻灯片收尾
 - [ ] 幻灯片总数与场景相符
 
@@ -208,7 +296,7 @@ npm install -g react-icons react react-dom sharp
 
 ## 第 5 步：生成幻灯片 JS 文件
 
-在 `slides/` 中为每张幻灯片创建一个 JS 文件，每个文件导出一个同步的 `createSlide(pres, theme)` 函数。
+在 `slides/` 中为每张幻灯片创建一个 JS 文件，每个文件导出一个同步的 `createSlide(pres, theme, ctx = {})` 函数。
 
 ### 图形布局选择（内容幻灯片）
 
@@ -243,8 +331,9 @@ npm install -g react-icons react react-dom sharp
 5. 字体：中文 = `Microsoft YaHei`，英文 = `Arial`
 6. 颜色：6 位十六进制，不带 `#`
 7. theme 对象约定：仅 5 个键（`primary`、`secondary`、`accent`、`light`、`bg`）
-8. **必须遵循精装交付标准**：每张内容页必须包含数据/统计、tagline、bullet 前缀、至少一种非文字视觉元素（SVG 图标/流程图/对比矩阵）、底部说明区
-9. 必须遵循 [pptxgenjs.md](pptxgenjs.md)
+8. master / section 约定：使用传入的 `ctx.masterName` 与 `ctx.sectionTitle`
+9. **必须遵循精装交付标准**：每张内容页必须包含数据/统计、tagline、bullet 前缀、至少一种非文字视觉元素（SVG 图标/流程图/对比矩阵）、底部说明区
+10. 必须遵循 [pptxgenjs.md](pptxgenjs.md)
 
 ### 内容富足检查清单（第 5.3 步）
 
@@ -263,12 +352,21 @@ const pptxgen = require("pptxgenjs");
 //   布局  : G2 总分布局 — 顶部全宽主概念，底部 3 个子卡片
 //   焦点   : 主框在 y:1.05 h:1.1（深蓝色，白色文字）
 //   区域   : 主框 x:0.45–9.55 | 子卡片 3 列，位于 y:2.65 以下
+//   母版      : CONTENT_MASTER
+//   章节      : 市场机会
+//   占位符    : title / subtitle / body
 //   背景      : theme.bg（FFFFFF，与所有内容页一致）
 //   页码标记   : slide 03
 
-function createSlide(pres, theme) {
-  const slide = pres.addSlide();
-  slide.background = { color: theme.bg };
+function createSlide(pres, theme, ctx = {}) {
+  const slide = pres.addSlide({
+    masterName: ctx.masterName || "CONTENT_MASTER",
+    sectionTitle: ctx.sectionTitle || "市场机会",
+  });
+
+  slide.addText("AI triage cut follow-up delays by 37%", {
+    placeholder: "title",
+  });
 
   // ... 幻灯片代码 ...
 
@@ -332,14 +430,30 @@ const theme = {
   bg:        "FFFFFF",
 };
 
-// ── 按顺序自动发现幻灯片文件 ────────────────────────────────────
-const slideFiles = fs.readdirSync(__dirname)
-  .filter(f => /^slide-\d+\.js$/.test(f))
-  .sort();
+// ── 先注册 master，再注册 section ───────────────────────────────
+pres.defineSlideMaster({ title: "COVER_MASTER", background: { color: theme.bg } });
+pres.defineSlideMaster({ title: "TOC_MASTER", background: { color: theme.bg } });
+pres.defineSlideMaster({ title: "SECTION_MASTER", background: { color: "EEF6FF" } });
+pres.defineSlideMaster({ title: "CONTENT_MASTER", background: { color: theme.bg } });
+pres.defineSlideMaster({ title: "SUMMARY_MASTER", background: { color: theme.bg } });
+pres.defineSlideMaster({ title: "APPENDIX_MASTER", background: { color: "F8FAFC" } });
 
-for (const file of slideFiles) {
-  const mod = require(path.join(__dirname, file));
-  mod.createSlide(pres, theme);
+["市场机会", "解决方案", "落地计划", "附录"].forEach((title) => {
+  pres.addSection({ title });
+});
+
+// ── 按 manifest 驱动，而不是裸遍历文件 ──────────────────────────
+const slideManifest = [
+  { file: "slide-01.js", masterName: "COVER_MASTER" },
+  { file: "slide-02.js", masterName: "TOC_MASTER" },
+  { file: "slide-03.js", masterName: "SECTION_MASTER", sectionTitle: "市场机会" },
+  { file: "slide-04.js", masterName: "CONTENT_MASTER", sectionTitle: "市场机会" },
+  { file: "slide-10.js", masterName: "APPENDIX_MASTER", sectionTitle: "附录" },
+];
+
+for (const spec of slideManifest) {
+  const mod = require(path.join(__dirname, spec.file));
+  mod.createSlide(pres, theme, spec);
 }
 
 // ── 输出 ────────────────────────────────────────────────────────────────
@@ -375,6 +489,7 @@ slides/
 ├── slide-02.js      # 目录
 ├── slide-03.js      # 章节分隔页
 ├── slide-04.js      # 内容页
+├── slide-10.js      # 附录长表格（可自动分页）
 ├── ...
 ├── compile.js       # 将所有幻灯片组合为 PPTX
 ├── imgs/            # 幻灯片引用的图片

@@ -24,6 +24,125 @@ pres.writeFile({ fileName: "Presentation.pptx" });
 - `LAYOUT_4x3`：10" x 7.5"
 - `LAYOUT_WIDE`：13.3" x 7.5"
 
+## Slide Master 与 Placeholder
+
+当 deck 有统一品牌元素、固定标题区、页脚、页码轨道、图表区或表格区时，优先使用 Slide Master，而不是在每张幻灯片中重复绘制。
+
+### 定义 Master
+
+```javascript
+const pptxgen = require("pptxgenjs");
+const pres = new pptxgen();
+
+pres.defineSlideMaster({
+  title: "CONTENT_MASTER",
+  background: { color: "FFFFFF" },
+  objects: [
+    { rect: { x: 0, y: 0, w: "100%", h: 0.7, fill: { color: "F8FAFC" } } },
+    { line: { x: 0.6, y: 0.9, w: 8.8, h: 0, line: { color: "1E88E5", width: 1.5 } } },
+    {
+      placeholder: {
+        options: { name: "title", type: "title", x: 0.6, y: 0.22, w: 7.8, h: 0.36 },
+        text: "(title placeholder)",
+      },
+    },
+    {
+      placeholder: {
+        options: { name: "body", type: "body", x: 0.6, y: 1.15, w: 4.0, h: 3.4 },
+        text: "(body placeholder)",
+      },
+    },
+    {
+      placeholder: {
+        options: { name: "chart", type: "chart", x: 4.9, y: 1.15, w: 4.4, h: 3.4 },
+      },
+    },
+  ],
+  slideNumber: { x: 9.2, y: 5.1, color: "64748B", fontFace: "Arial", fontSize: 10 },
+});
+```
+
+使用时，把 master 名称传给 `addSlide()`：
+
+```javascript
+const slide = pres.addSlide({ masterName: "CONTENT_MASTER" });
+```
+
+### 使用 Placeholder
+
+在 master 中先声明 placeholder，再通过 `placeholder` 名称填充内容：
+
+```javascript
+const slide = pres.addSlide({ masterName: "CONTENT_MASTER" });
+
+slide.addText("AI triage cut follow-up delays by 37%", {
+  placeholder: "title",
+});
+
+slide.addText([
+  { text: "3 pilot hospitals online", options: { bullet: true, breakLine: true } },
+  { text: "Median wait time down from 54m to 34m", options: { bullet: true } },
+], {
+  placeholder: "body",
+});
+
+slide.addChart(pres.charts.BAR, [{
+  name: "Wait Time",
+  labels: ["Before", "After"],
+  values: [54, 34],
+}], {
+  placeholder: "chart",
+});
+```
+
+### Placeholder 类型
+
+PptxGenJS 官方支持以下 placeholder type：
+
+| type | 用途 |
+|------|------|
+| `title` | 标题 |
+| `body` | 正文区 |
+| `image` | 图片 |
+| `chart` | 图表 |
+| `table` | 表格 |
+| `media` | 音视频 |
+
+**建议**：在 skill 中稳定使用 `title`、`subtitle`、`body`、`chart`、`table`、`insight`、`media` 这些命名。视觉风格可以变化，但槽位语义不要漂移。
+
+## Sections（章节）
+
+当 deck 有目录、章节分隔页和附录时，优先把结构同步到 PowerPoint section，而不是只做视觉上的“章节页”。
+
+```javascript
+const pptxgen = require("pptxgenjs");
+const pres = new pptxgen();
+
+pres.addSection({ title: "Market Opportunity" });
+pres.addSection({ title: "Solution" });
+pres.addSection({ title: "Appendix" });
+
+const slide = pres.addSlide({
+  masterName: "CONTENT_MASTER",
+  sectionTitle: "Solution",
+});
+
+slide.addText("This slide belongs to the Solution section.", {
+  x: 1,
+  y: 1,
+  w: 6,
+  h: 0.4,
+  fontSize: 20,
+  color: "1F2937",
+});
+```
+
+**建议：**
+
+- 封面、目录页可不归属 section
+- 章节分隔页、内容页、总结页、附录页应显式指定 `sectionTitle`
+- TOC 文案、Section Divider 标题、`addSection({ title })` 的标题保持一致
+
 ## 文字与格式
 
 ```javascript
@@ -252,6 +371,49 @@ let tableData = [
 ];
 slide.addTable(tableData, { x: 1, y: 3.5, w: 8, colW: [4, 4] });
 ```
+
+### 表格自动分页（Appendix 推荐）
+
+长表格不要硬塞在内容页里。PptxGenJS 原生支持 `autoPage`，适合附录明细表：
+
+```javascript
+slide.addTable(tableRows, {
+  placeholder: "table",
+  autoPage: true,
+  autoPageRepeatHeader: true,
+  autoPageHeaderRows: 1,
+  newSlideStartY: 1.15,
+  border: { pt: 1, color: "CBD5E1" },
+  fill: { color: "FFFFFF" },
+  fontFace: "Microsoft YaHei",
+  fontSize: 10,
+});
+```
+
+关键选项：
+
+- `autoPage: true`：表格溢出时自动创建后续幻灯片
+- `autoPageRepeatHeader: true`：每页重复表头
+- `autoPageHeaderRows: 1`：多行表头时，指定重复几行
+- `newSlideStartY`：续页表格从新的 y 位置开始，避免浪费空间
+
+**使用建议：**
+
+- 内容页保留结论摘要和小表；长明细表直接移入 appendix
+- Appendix 页优先使用专门的 `APPENDIX_MASTER`
+- 表格一旦需要缩到 10pt 以下才能塞进内容页，就已经应该拆到 appendix
+
+### HTML 表格导出（备选）
+
+如果明细表天然存在于网页 DOM 中，也可以使用 `tableToSlides()` 直接生成 1–N 页 PPT 表格：
+
+```javascript
+pptx.tableToSlides("myHtmlTableID", {
+  master: "APPENDIX_MASTER",
+});
+```
+
+这条路径更适合“已有 HTML 表格”的场景；当前 skill 的代码生成路径仍优先使用 `addTable(..., { autoPage: true })`。
 
 ## 图表
 

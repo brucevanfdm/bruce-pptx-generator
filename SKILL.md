@@ -21,7 +21,7 @@ description: "Use this skill when the user explicitly wants to create, generate,
 
 ### 路由隔离
 
-- **仅在生成路径**下使用 `createSlide()`、`compile.js`、`theme` 五键约定、页码徽章、Rich Card 组件和封面/目录/章节分隔页规则。
+- **仅在生成路径**下使用 `createSlide()`、`compile.js`、`theme` 五键约定、Slide Master / Placeholder、PPT Section、页码徽章、Rich Card 组件和封面/目录/章节分隔页规则。
 - **编辑路径**默认保留模板结构和视觉语言，除非用户明确要求“整套重建为代码生成版”，否则不要把生成路径的组件规范硬套到 XML 编辑任务上。
 - **编辑路径**的首要目标是模板兼容、最小必要改动和重新打包后的文件可打开；**生成路径**的首要目标是新 deck 的叙事、布局和一致性。
 
@@ -124,9 +124,54 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 
 各预设文件（`huawei-style.md` 等）中的组件函数（`addHuaweiRichCard`、`makePainPointCard` 等）可以引用预设文件中定义的扩展 key，如 `theme.border`、`theme.bodyText`、`theme.mutedText`、`theme.orangeLight` 等。这些 key 在预设文件的 `theme` const 块中均有定义，不属于违规。
 
+**生成骨架（强制）** — 生成路径不再把 deck 视为“一堆独立页面”，而是先定义 deck skeleton，再填内容：
+
+1. **先注册 Master，再生成 Slide**
+   - 在 `compile.js` 中先调用 `pres.defineSlideMaster()` 注册母版，再进入 slide 文件循环。
+   - 至少准备以下母版：`COVER_MASTER`、`TOC_MASTER`、`SECTION_MASTER`、`CONTENT_MASTER`、`SUMMARY_MASTER`。
+   - 需要长表格附录时，再额外定义 `APPENDIX_MASTER`。
+   - Logo、页脚、页码带、统一装饰线、固定免责声明等**重复 chrome**，优先放进 master；不要在每张 slide 文件里重复手写。
+
+2. **Placeholder 名称必须稳定**
+   - 不同风格可以有不同视觉，但**同一语义槽位**优先复用相同 placeholder 名：`title`、`subtitle`、`body`、`chart`、`table`、`insight`、`media`。
+   - 在 master 中先定义 placeholder，再在 slide 中通过 `placeholder` 名称填充内容。
+   - 禁止每个风格各自发明一套完全不同的槽位命名，否则 compile 阶段无法做统一编排。
+
+3. **Section 必须是 deck 的一等结构**
+   - 每个主要章节都先用 `pres.addSection({ title })` 注册，再将对应 slide 通过 `sectionTitle` 挂入该章节。
+   - 封面和目录页可以不属于任何 section；章节分隔页、内容页、总结页、附录页必须明确属于某个 section。
+   - TOC 中的章节名称、Section Divider 标题、PPT 内部 section title 三者必须一致。
+
+4. **长表格默认进入 Appendix，而不是硬塞内容页**
+   - 如果表格超出当前风格的安全密度上限，或为了塞进内容页必须把字号压到不可读，直接移入 appendix。
+   - Appendix 表格必须启用 `addTable(..., { autoPage: true, autoPageRepeatHeader: true })`；多列表头时同步设置 `autoPageHeaderRows`。
+   - 内容页只保留结论摘要、小型对比表或关键 3–6 行；长明细表放到 appendix section。
+
 **页码徽章** — 仅适用于生成路径。除封面外每张幻灯片都必须有。只显示页码数字（例如 `"3"`），禁止使用 `"3/12"` 格式。具体坐标和形状以当前预设文件中的 `addPageBadge` 实现为准（qa.md §6 有各预设的参考值）。
 
 **`createSlide()` 必须是同步函数** — 仅适用于生成路径，禁止使用 `async`。compile.js 不会 await 它。
+
+**`createSlide()` 推荐签名** — 统一使用 `createSlide(pres, theme, ctx = {})`：
+
+- `ctx.masterName`：当前页使用的 master 名称
+- `ctx.sectionTitle`：当前页所属 section
+- `ctx.assets`：预生成图标、图片、SVG base64 等
+- `ctx.meta`：页码、目录条目、章节号等编排信息
+
+如果当前 slide 由 placeholder 驱动，应优先写成：
+
+```javascript
+function createSlide(pres, theme, ctx = {}) {
+  const slide = pres.addSlide({
+    masterName: ctx.masterName,
+    sectionTitle: ctx.sectionTitle,
+  });
+
+  slide.addText("Quarterly Review", { placeholder: "title" });
+  slide.addText("Revenue grew 28% year over year", { placeholder: "subtitle" });
+  return slide;
+}
+```
 
 ## 禁止事项（常见 AI 生成质量陷阱）
 
@@ -144,12 +189,14 @@ compile.js 中定义的 `theme` 对象只传这 5 个键。subagent 在 DESIGN I
 - 每个元素都加渐变色 — 渐变只用于强调，不滥用
 - 所有内容居中对齐 — 会显得呆板，左对齐更有层次感
 - 装饰性色块堆砌，没有布局逻辑
+- 明明可以放进 master 的固定元素，却在每张 slide 中重复手写
 
 **文字**
 
 - 标题照抄正文第一句 — 标题应该是结论或主旨，不是描述
 - 英文 text 混用宋体/仿宋 — 英文必须用指定英文字体
 - `#` 前缀颜色值（`"#1F3864"` → 改为 `"1F3864"`）— 会导致文件损坏
+- 长表格强行塞进内容页，导致字号过小、阅读失败；应改为 appendix + auto-paging
 
 ## 依赖安装
 
